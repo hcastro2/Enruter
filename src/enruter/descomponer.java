@@ -89,8 +89,8 @@ public class descomponer {
     texto=texto.replace("kr ", "cr ");
     texto=texto.replace("nâ°", "#");texto=texto.replace("n0", "#");
     texto=texto.replace("manzana ", "mz ");texto=texto.replace("manz ", "mz ");texto=texto.replace("manza ", "mz ");
-    texto=texto.replace("manzana", "mz ");texto=texto.replace("manz", "mz ");texto=texto.replace("manza", "mz ");
-    texto=texto.replace("numero", " ");texto=texto.replace("/", " ");texto=texto.replace("manzan ", "mz ");
+    texto=texto.replace("manzana", "mz ");texto=texto.replace("manzan ", "mz ");
+    texto=texto.replace("numero", " ");texto=texto.replace("/", " ");
     texto=texto.replace("kilometro", " km ");
     texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
     texto=texto.replace("manzana", "mz");texto=texto.replace("casa", "cs");
@@ -300,19 +300,20 @@ public void expresion (String exp){ //String expresion (String exp){
  
             
     //////////ES NECESARIO QUE LA SINTAXIS EL CARDINAL SEA PRIMERO QUE EL PRIMER NUMERO//////////////////////////// 
-    cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
+    cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av"); 
     int pointCardinal,pointnumeric1; pointnumeric1=exp.indexOf(numeric1); pointCardinal=  exp.indexOf(cardinal1); 
       if (pointnumeric1<pointCardinal){control="invertido";}//caso especial donde se invierte la estructura de la nomenclatura  
       if ("av".equals(cardinal1)){control="null";}
       if (cadenaq1.contains(".km.")){control="null";}
-
+      
 
        sintaxis=control;// JOptionPane.showMessageDialog(null, contltr+"#"+contnum+"#"+control);
      }
     catch(Exception e){
         sintaxis="null";//JOptionPane.showMessageDialog(null, "error");
         String subviales[] = vectorabc.split(","); if(subviales.length>3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
-        
+        String exp2="."+exp;
+      if ((exp2.contains(".mz."))&&(exp2.contains(".cs."))){sintaxis="mz";}
     }  
 }   
 public String divExpresion (String s){
@@ -547,16 +548,19 @@ private void subVia(String s){
 public String especialcase (String e){
     int s = -1;
     if(("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=0;}
-    if(("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==0)){s=1;}
+    if(("ltr".equals(sintaxis))&&(contltr>=1)&&(
+            contnum==0)){s=1;}
     if((e.contains("av."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=2;}
     if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
     if((e.contains("km."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=0)){s=4;}//casos con kilometro
     if (("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==2)){s=5;}//caso 
     if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
     if (("vialExtra".equals(sintaxis))){s=7;}//casos con mas de 2 letras para determinar subvia
+    if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
+        if((ee.contains(".mz."))&&(ee.contains(".cs."))){s=8;}  ;}
     ////////////espacio para otros casos
-    if (("null".equals(sintaxis))&&(contnum==0)){s=9;}//dejar este como ultimo caso con cero numeros y todas
-    if (("null".equals(sintaxis))&&(contnum==1)){s=10;}//dejar este como ultimo caso con cero numeros y todas 
+    if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=9;}//dejar este como ultimo caso con cero numeros y todas
+    if (("null".equals(sintaxis))&&(contnum==1)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas 
       switch(s){
           case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
           array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
@@ -620,7 +624,22 @@ public String especialcase (String e){
      }
                            
               break;
+          case 8: //CASO DE MANZANAS 
+            int pointMz=-1,pointCs=-1;String numMz,numCs;  
+              String segmentos2[] = e.split("\\."); String baseabc = "#abcdefghijklmnopqrstuvwxyz";
+              pointMz = Arrays.asList(segmentos2).indexOf("mz");
+              pointCs= Arrays.asList(segmentos2).indexOf("cs");
+              numMz= (pointMz==-1)?"":segmentos2[pointMz+1];
+              numCs= (pointCs==-1)?"": segmentos2[pointCs+1];  
+              if((segmentos2[pointMz].length()==2)&&(segmentos2[pointCs].length()==2)){
+              if(isnumeric(numMz)==true){array[7]=numMz;}else{array[7]=baseabc.indexOf(numMz); }
+              if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]=""; }
+                 if( "-1".equals(array[7].toString())){array[7]=0;}//if( Integer.parseInt((String)array[8])==-1){array[8]=0;}
+              }else{
+                e="ErrMz: "+arrayTostring(segmentos2);
+              }
               
+              break;
           case 9:
               String segment[] = textIni.split(" ");
               e="Rural: "+arrayTostring(segment);

@@ -223,6 +223,8 @@ public  void importCsv() throws IOException {
                  //JOptionPane.showMessageDialog(null,valores.getCadena());
              }
          }
+         
+       System.gc();zn=null;bzn=null;l=null;br=null; 
 ///////////////////////////////////////////////////////////////////////////////////////////////
          JOptionPane.showMessageDialog(null, "Proceso Finalizado");
       } catch (Exception e) {
@@ -281,6 +283,7 @@ public  void exportExcel(Object data[][], Object cabecera[]) throws BiffExceptio
             workbook.write();   
             workbook.close();
             lista=null;sheet=null;workbook=null;
+            System.gc(); 
             //Desktop.getDesktop().open(new File(strPath+"reporte.xls"));
     }
     catch (IOException ex)
@@ -331,7 +334,7 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
        //Escribe todos los label creados al workbook sino esta el write se crea el archivo vacio.
             workbook.write();
             workbook.close();
-            sheet=null;workbook=null;
+            sheet=null;workbook=null;System.gc();
             //Desktop.getDesktop().open(new File(strPath+"reporte.xls"));
     }
     catch (IOException ex)

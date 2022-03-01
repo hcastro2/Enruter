@@ -1,0 +1,17 @@
+av.19,cr.
+av.americas,ak.13.
+av.las.americas,ak.13.
+av.colombia,ac.10.
+av.treinta.de.agosto,cl.5.
+av.3.norte,cr.
+av.4.norte,cr.
+av.4,cr.
+av.5.norte,cr.
+av.6.norte,cr.
+av.6,cr.
+av.7.norte,cr.
+av.8.norte,cr.
+av.9.norte,cr.
+av.pasoancho,cl.13.
+av.4.oeste,cr.
+av.roosevelt,cl.10.

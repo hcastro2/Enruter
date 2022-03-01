@@ -1,0 +1,1159 @@
+package enruter;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+import java.text.Normalizer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.swing.JFileChooser;
+
+
+public class descomponer {
+// la idea es tomar el texto original y eliminar los posibles errores y particularidades del lenguaje comun    
+    public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
+    String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni;
+    String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cardinal1,cardinal2;
+  
+  public void inicomponentes() {
+        this.finnumericos = "";
+        this.numeric1 = "";this.numeric2 = "";this.numeric3 = "";
+        this.contnum=0;this.contLetra1digito=0;this.contltr=0;
+        this.sintaxis = "";
+        //this.array = null;this.letraabc = null;
+    }   
+    public String texting (String textoOrigen){//FUNCION PRINCIPAL
+        //eliminar del texto original puntos y espacios dobles y caracteres especiales y otros aspectos del lengujae comun//
+         textoOrigen = preformatear(textoOrigen);textIni=textoOrigen;
+    
+            String result="",sub;int cont=0 ;
+             StringTokenizer token = new StringTokenizer(textoOrigen," ");
+              while (token.hasMoreTokens()){
+                  
+              sub = (token.nextToken());cont++;
+              result = result+"."+sub;
+                                           }
+              result = result.substring(1, result.length()) ;  
+              result = alfanumeric(result);//descomponer alfanumericos
+              result = textdelet(result);//eliminando texto inicesario
+              result = sintax(result);//Corregir problemas de sintaxis
+              expresion(result);//GENERA LA EXPRESION FINAL ANTES DE GENERAR EL CODIGO;SE REQUIERE CONTROL DE SINTAXIS MINIMA
+              //JOptionPane.showMessageDialog(null, sintaxis);//define ltr=cl,cr,etc+cantidad de textos y numericos
+              if (("ltr".equals(sintaxis))&&(contltr>0)&&(contnum>2)){//EJECUTA PROCESO DE CODIGO SI LA SINTAXIS MINIMA SE CUMPLE
+              result=divExpresion(result);
+              coordenada(result);
+              cardinal(result);/*subvial(result);*/
+              subVia(result);
+              subcardinal(result);
+              codigo();
+              }else{//DE LO CONTRARIO PASAMOS A REVISAR OTROS CASOS DE SINTAXIS
+                  
+                result=especialcase(result);  
+              }
+              if (array[9]==null){}else{result = result+array[9];}//VUELVE A COMPLETAR LA CADENA QUE SE HABIA DIVIDIDO PARA MAYOR CONTROL
+            return result;
+    }
+//////////////////////////PREFORMATEAR LA EXPRESION//////////////////////////////////////  
+    public String preformatear(String texto){
+  
+        if ("".equals(texto)){texto="Null";}
+        texto = texto.trim();texto=texto.replace("N°","#");texto=texto.replace("¥","");texto=texto.replace("NË"," ");
+        texto=texto.replace("N?"," ");texto=texto.replace(" NÉ "," ");texto=texto.replace(" N` "," ");texto=texto.replace(" N§ "," ");
+        texto=texto.replace(" Nø "," ");texto=texto.replace(" ?Ñ "," ");texto=texto.replace(" NÂ° "," ");
+        texto=texto.replace("?","#");texto=texto.replace("æ"," ");texto=texto.replace("N§"," ");
+        texto = texto.replaceAll("[#-/_]", " ");//caracteres especiales que se reemplazan por espacio
+        texto = texto.replaceAll("[–.,;:·]", " ");texto = texto.replaceAll("  ", " ");
+        texto = Normalizer.normalize(texto, Normalizer.Form.NFD);           ///  ESTAS LINEAS
+        texto = texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", ""); ///  ELIMINAN TILDES 
+        texto = texto.toLowerCase();//eliminar mayusculas   
+        //////////////ESTANDARIZAR EXPRESIONES
+    texto=texto.replace("ª","#");texto=texto.replace("º","#");texto=texto.replace("°","#");texto=texto.replace("*","");
+    texto=texto.replace("½"," ");texto=texto.replace("ï"," ");texto=texto.replace("¿"," ");
+    texto=texto.replace("ak ","cr av");texto=texto.replace("ac ", "cl av");texto=texto.replace("1ra", "1");texto=texto.replace("3ra", "3");
+    texto=texto.replace("carrera","cr");texto=texto.replace("karrera", "cr ");texto=texto.replace("cra ", "cr ");texto=texto.replace("kra", "cr ");
+    texto=texto.replace("kr ", "cr ");
+    texto=texto.replace("nâ°", "#");texto=texto.replace("n0", "#");
+    texto=texto.replace("manzana ", "mz ");texto=texto.replace("manz ", "mz ");texto=texto.replace("manza ", "mz ");
+    texto=texto.replace("manzana", "mz ");texto=texto.replace("manz", "mz ");texto=texto.replace("manza", "mz ");
+    texto=texto.replace("numero", " ");texto=texto.replace("/", " ");texto=texto.replace("manzan ", "mz ");
+    texto=texto.replace("kilometro", " km ");
+    texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
+    texto=texto.replace("manzana", "mz");texto=texto.replace("casa", "cs");
+    texto=texto.replace("transversal", "tv ");texto=texto.replace("trr ", "tv ");texto=texto.replace("transv ", "tv ");
+    texto=texto.replace("trv ", "tv ");texto=texto.replace("trasv ", "tv ");texto=texto.replace("tras ", "tv ");
+    texto=texto.replace("trasversal ", "tv ");texto=texto.replace("trans ", "tv ");texto=texto.replace("tr ", "tv ");
+    texto=texto.replace("diagonal", "dg");texto=texto.replace("diag ", "dg");texto=texto.replace("dig ", "dg");
+    texto=texto.replaceFirst("calle", "cl ");texto=texto.replace("calle ", "cl ");texto=texto.replace("cll ", "cl ");
+    texto=texto.replace("clle ", "cl ");texto=texto.replace("call ", "cl ");
+    texto=texto.replace("nro ", " ");texto=texto.replace("NRO", " ");texto=texto.replace(" no ", " ");texto=texto.replace(" No ", " ");
+    texto=texto.replace(" oe ", " oeste ");texto=texto.replace(" es ", " este ");
+    texto=texto.replace("norte", " norte ");texto=texto.replace(" nte ", " norte ");texto=texto.replace("sur", " sur ");
+    texto=texto.replace("b/"," "); texto=texto.replace("avenida","av");texto=texto.replace("avda","av");
+    texto=texto.replace("aven","av ");
+    texto=texto.replace("n#","#"); texto=texto.replace("#"," ");
+     /////////////////////////////////////////////////////////////////////////////////////////////
+                                                                               
+     if ((texto.isEmpty())||(" ".equals(texto))) {texto="null"; } 
+//////////////////////////////////////////////////////////////////////////////////////////////////   
+    
+     return texto;   
+    }
+//////////////////SUBFUNCIONES PARA DESCOMPONER MAS EL TEXTO//////////////
+ public String alfanumeric (String texto){//determina si es alfanumerico un texto
+       String result="",sub = null,text;
+       int cont = 0; ArrayList<String> cadena = new ArrayList<>();
+      StringTokenizer token = new StringTokenizer(texto,".");
+              while (token.hasMoreTokens()){
+              sub = (token.nextToken());
+              if (!"".equals(sub)){}
+                if ((sub.matches("[a-zA-Z]+")==false) && (sub.matches("[0-9]+")==false)){//recorre y confirma alfanumericos
+                    separar(sub);//result= texto.replace(sub,separar(sub));
+                      //JOptionPane.showMessageDialog(null,separar(sub));
+                      cont++;cadena.add(separar(sub));
+                     }
+                                          }
+              for (int i =0; i < cadena.size();i++){text = cadena.get(i);text=text.replace(".", "");
+                  texto= texto.replace(text,cadena.get(i)); 
+                  //JOptionPane.showMessageDialog(null,text); 
+              }
+            result=texto;
+        result=("".equals(result))?texto:result;                   
+       return result;
+                                        } 
+    public String separar (String alfanum){
+     String result="",a,l="",n="",t="",sub;int largo = alfanum.length(); //char a,b = 0;
+     
+        for (int i =0; i < largo;i++){
+            a = alfanum.substring(i, i+1);
+            
+             if ((isletra(a)==true)){
+               l= l+a;n=n+"."; 
+                                    }
+             if ((isnumeric(a)==true)){
+               n=n+a;l=l+"."; 
+                                      }
+              t=n+"."+l;
+        }   
+        ////////////////
+       StringTokenizer token = new StringTokenizer(t,".");
+              while (token.hasMoreTokens()){
+              sub = (token.nextToken());
+             
+              if (!"".equals(sub)){
+                alfanum=alfanum.replace(sub, sub+".");// alfanum=alfanum.replace(sub, sub+".");original
+                                   }
+              }
+              result=alfanum;//JOptionPane.showMessageDialog(null,alfanum);
+     return result;
+ }//SUBFUNCION DENTRO DE ALFANUMERIC
+ public String textdelet (String texto){//eliminar textos inecesarios como No,etc K,etc 
+       String result="";int control = -1;
+       if((texto.contains(".cl.")==false)&&(texto.contains(".cr.")==false)){control=0;};
+       result = texto.replace(".No.", ".");
+       //if ((texto.contains("av."))&&(control==0)){sintaxis="av?";}//si no contiene la expresion completa avenida mas calle o carrera asume estandar de avenida calle
+      String segmentos[] = texto.split("\\.");
+      //CORREGIMOS Y ELIMINAMOS AL PRINCIPIO DE LA NOMENCLATURA
+      if (segmentos[0].length()==1){result=corregirText(texto,segmentos);}//caso c=calle k=carrera
+      if (segmentos[0].contains("avn")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("crr")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("car")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("cll")){result=corregirText(texto,segmentos);}
+      if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))){result=corregirText(texto,segmentos);}
+      if("".equals(result)){result=texto;}//si no encuentra correccion devuelve el texto completo
+       return result;
+                                        }
+ public String sintax (String txt){ //POSICION.LARGO.CASO.SUBCADENA///////////////
+    int contnumeros=0;String acumulador=".",acumulador2=".",cola=".",cola2=".";String sub="";// es necesario que previamente se tome el texto hasta el final del 3 numero
+    StringTokenizer token = new StringTokenizer(txt,".");
+              while (token.hasMoreTokens()){
+                  sub = (token.nextToken());
+                  if (contnumeros<2){acumulador2=acumulador2+"."+sub;}else{cola2=cola2+"."+sub;}
+                  if (contnumeros<3){acumulador=acumulador+"."+sub;}else{cola=cola+"."+sub;}
+                  if (isnumeric(sub)==true){contnumeros++;}    
+              }
+   if(contnumeros==2){acumulador=acumulador2;}else{}           
+   cadena3num= acumulador.replace("..", ".");//aqui guarda en memoria la cadena hasta el tercer numero
+   /////////////////////////////////////FIN DEL CONTROL PREVIO ARROJA SUBCADENA HASTA EL 3 NUMERO           
+    String result;txt=acumulador+".";txt = txt.replace("..", ".");
+        int caso=0,cont=0,largo=0,point = 0;
+        ArrayList<String> subcadena = new ArrayList<>();//NO PUEDO USAR ARRAY LIST
+         token = new StringTokenizer(txt,".");
+              while (token.hasMoreTokens()){
+             caso=0; sub = (token.nextToken());largo=sub.length();point=txt.indexOf(sub);
+             
+                  if ((largo==2)&&(sub.contains("n"))&&(!"no".equals(sub))){caso=1;}//caso 1
+                  if ((largo==2)&&(sub.contains("e"))){caso=2;}//caso 2 casos 3 y 4 reservados para Sur y oriente
+                  if ((largo==1)&&(sub.equals("t"))){caso=5;}
+                  if (caso==1){subcadena.add(caso+","+point+","+largo);}
+                  if (caso==2){subcadena.add(caso+","+point+","+largo);}
+                  if (caso==5){subcadena.add(caso+","+point+","+largo);}
+                    }
+ /////////////////////////CONTROLAMOS QUE EL TEXTO ESPECIAL ESTE ENTRE EL PRIMER CARDINAL Y EL ULTIMO NUMERO///////////////////////////////////////////////////////////////////////////////
+     String control = matchText(txt,"cl,dg,cr,tv,av");int bandera;
+    if(control==null){bandera=-1;}else{ 
+        bandera=txt.indexOf("."+control+".");}
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////CORREGIR CASOS ESPECIALES DE SINTAXIS/////////////////////
+       cont=0; 
+        for (String subcadena1 : subcadena) {
+            String original,reemplazo;
+            sub=subcadena.get(cont);int w = Integer.parseInt(sub.substring(0,1));int inicio,larg;
+              Object  dato[]= sub.split(",");
+              if ((Integer.parseInt((String)dato[1])<bandera)||(bandera==-1)){}else{
+              switch(w){
+                case 0:
+             
+                 break;
+                case 1: //PRIMER CASO CON DOS CARACTERES + n ESTANDARIZA A LA NOMENCLATURA NORTE   
+                  Object  data[]= sub.split(",");
+                  inicio= Integer.parseInt((String) data[1]);larg= Integer.parseInt((String) data[2]);
+                  original="."+txt.substring(inicio,inicio+2)+".";
+                  reemplazo="."+txt.substring(inicio,inicio+1)+".norte.";
+                  txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
+                     data=null;
+                 break;
+                case 2:
+                    Object  data1[]= sub.split(",");
+                  inicio= Integer.parseInt((String) data1[1]);larg= Integer.parseInt((String) data1[2]);
+                  original="."+txt.substring(inicio,inicio+2)+".";
+                  reemplazo="."+txt.substring(inicio+1,inicio+2)+".este.";
+                  txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
+                  data1=null;
+                   break;
+                case 5:
+                    Object  data2[]= sub.split(",");
+                  inicio= Integer.parseInt((String) data2[1]);larg= Integer.parseInt((String) data2[2]);
+                    original="."+txt.substring(inicio,inicio+1)+".";
+                  reemplazo=".tv.";
+                    txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
+                    data1=null;
+                    break;
+                default:  
+              
+                      }//end switch
+                 }//end if
+            cont++;
+        }//end for
+      cadena3num =  generarCadena3num(txt);
+       if (contnumeros>=3) {txt=txt+cola;}else{txt=txt+cola2;} //COMO SEPARE LA CADENA EN DOS AHORA LA VUELVO A UNIFICAR
+       txt = txt.replace("..", ".");txt = txt.replace("..", ".");txt=txt.replaceFirst(".", "");
+        
+       result=txt;
+       return result; 
+    }
+////////////FUNCIONES PARA TRANFORMAR UNA EXPRESION DEL LEXICO A EXPRESION NUMERICA CARTESIANA/////////////
+// <editor-fold defaultstate="collapsed" desc="Generated Code Configuracion del Codigo"> 
+/////CONFIGURACION OBJETIVO 0.0.0.0.0.0.0.0.0.0.0.0.0.0 14 ESPACIOS//////////////////////////////////////
+/////[0.][0.0.0.][0.0.0.][0.0.][0.0.][0.0][0]=[CARDINAL][VIA,SUBVIA EJE X,#][VIA,SUBVIA EJE Y,# ][#CASA][SUB#CASA][SUBSECTORES]
+//posicion [0] COORDENADA
+//POSICION 1   CALLE, DIAGONAL O UBICACION EJE X
+//POSICION 2   NUMERO DE LA CALLE
+//POSICION 3   SUBCALLE a,b,c,d... etc   
+//POSICION 4   CARRERA, TRANSVERSAL O UBICACION EJE Y
+//POSICION 5   NUMERO DE LA CARRERA
+//POSICION 6   SUBCALLE a,b,c,d... etc
+//POSICION 7   UBICACION DEL NUMERO DE LA CASA 1 POR LA CARRERA 0 POR LA CALLE
+//POSICION 8   NUMERO DE LA CASA   
+//POSICION 9   NUMERO DE SUBCASA = PISO  USAR POR EL MOMENTO PARA AGREGAR TODO EL TEXTO COMPLEMENTARIO
+//POSICION 10  NUMERO DE SUBCASA = APARTAMENTO    
+//POSICION 11  RESEVADO:GENERAMOS EL CODIGO DE CUADRANTE PREVIO A LA ZONOFICACION   (4.5) 
+//POSICION 12  RESEVADO:CODIGO DE LA CIUDAD
+// </editor-fold>     
+public void expresion (String exp){ //String expresion (String exp){
+    //primero convertir el texto formateado en un subcodigo o id_direccion comparable con sus similares
+    //de la forma siguiente:  urbano.cl.23x.34y.45.z.k  norte.cl.23a.34b.45.1.1
+    try{
+    String sub;
+    String base = "cl,cr,dg,tv", control = "null";
+    //determinar si el texto recibido es numerico o string
+   StringTokenizer token = new StringTokenizer(exp,".");
+              while (token.hasMoreTokens()){
+              sub = (token.nextToken());
+              if ((isnumeric(sub)==true)&&(contnum==2)){array[8]=sub;}//puede ser un error
+              if ((isnumeric(sub)==true)&&(contnum==0)){numeric1=sub;}//puede ser un error
+              if ((isnumeric(sub)==true)&&(contnum==1)){numeric2=sub;}//puede ser un error
+              if (isnumeric(sub)==true){contnum++;finnumericos=sub;}
+              if ((isnumeric(sub)==true)&&(contnum==3)){numeric3=sub;}
+              if (isletra(sub)==true){contltr++;}if (buscar(sub,base)==true){control="ltr";}
+              if ((isletra(sub)==true)&&(sub.length()==1)){vectorabc=vectorabc+","+sub;}//CASO CON MAS DE 2 LETRAS PARA DEFINIR SUBVIA
+              if ((contnum>0)&&(contnum<3)&&(isletra(sub)==true)&&(sub.length()==1)&&(!"n".equals(sub))){letraabc[contLetra1digito]=sub;contLetra1digito++;}
+         
+          //contnum cuenta cada subcadena con datos numericos
+          if (contnum<2){cadenaq1=cadenaq1+"."+sub;}
+          if ((contnum>=2)&&(contnum<3)){cadenaq2=cadenaq2+"."+sub;}       
+                                           }
+ 
+            
+    //////////ES NECESARIO QUE LA SINTAXIS EL CARDINAL SEA PRIMERO QUE EL PRIMER NUMERO//////////////////////////// 
+    cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
+    int pointCardinal,pointnumeric1; pointnumeric1=exp.indexOf(numeric1); pointCardinal=  exp.indexOf(cardinal1); 
+      if (pointnumeric1<pointCardinal){control="invertido";}//caso especial donde se invierte la estructura de la nomenclatura  
+      if ("av".equals(cardinal1)){control="null";}
+      if (cadenaq1.contains(".km.")){control="null";}
+
+
+       sintaxis=control;// JOptionPane.showMessageDialog(null, contltr+"#"+contnum+"#"+control);
+     }
+    catch(Exception e){
+        sintaxis="null";//JOptionPane.showMessageDialog(null, "error");
+        String subviales[] = vectorabc.split(","); if(subviales.length>3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
+        
+    }  
+}   
+public String divExpresion (String s){
+    String textInicio,textFinal;
+    int posicion_numeric;//array[0]=0;
+   posicion_numeric=cadena3num.lastIndexOf(numeric3);textInicio=s.substring(0,posicion_numeric+numeric3.length());//limitamos la busqueda hasta la ultima posicion numerica evitando casos de expresiones muy largas
+   textFinal = s.substring(posicion_numeric+numeric3.length(),s.length());
+   //ES NECESARIO DETERMINAR MAS ESPECIFICAMENTE ESTOS CASOS YA QUE LA N SE EXCLUYE DE LAS NOMENCLATURAS COMO SUBVIA PERO SIRVE PARA DETERMINAR SI ES NORTE DE MANERA ABREVIADA PERO TAMBIEN PARA LA PALABRA NUMERO
+   textInicio = textInicio.replace(".n.", ".");/////DEBE TENER UNA VALIDACION PREVIA
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    array[9]=textFinal;
+   //JOptionPane.showMessageDialog(null,textFinal);
+    
+    return textInicio;
+}
+public void coordenada(String s){//determina cardinal:norte,sur,oeste,oriente
+    array[0]=0;
+      //try{ 
+   String base[] = {"null=urbano","norte","sur","este","oeste"};int cont=0;//,posicion_numeric;//array[0]=0;
+   s=cadena3num;
+ // posicion_numeric=s.lastIndexOf(numeric3)+numeric3.length();s=s.substring(0,posicion_numeric);//limitamos la busqueda hasta la ultima posicion numerica evitando casos de expresiones muy largas
+    
+   for (String base1 : base) {
+       
+       if (s.indexOf("."+base[cont]+".")>0){
+           
+           array[0]=cont;
+                                           }
+                 cont++;
+                             }
+      //JOptionPane.showMessageDialog(null,array[0]);
+}
+public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=cr,tv,etc y los ubica en sus posiciones del id
+   String match = "";
+    String base[] = {"cl","dg","cr","tv","mz","ak","ac"};int cont=0;String q = null;
+   c="."+c;array[1]="";array[4]="";int point = c.indexOf("."+numeric1+".");
+   for (String base1 : base) {
+       int z = cont; q = c.substring(0, point+1);
+       //JOptionPane.showMessageDialog(null,q);
+       if ((q.indexOf("."+base[cont]+".")>-1)){
+             match="."+base[cont]+".";
+            switch(z){
+              case 0: case 1:
+                  array[1]=cont;array[2]=numeric1;array[5]=numeric2;array[7]=1;//subvial(c);//caso eje x 
+                  break;
+              case 2: case 3:
+                  array[4]=cont;array[5]=numeric1;array[2]=numeric2;array[7]=0;
+                  break;
+                 
+              case 4: 
+                  array[1]=cont;
+                  break;
+              case 5: 
+                  array[1]=0;array[4]=cont;array[5]=numeric1;array[2]=numeric2;array[7]=0;
+                  break;  
+              case 6: 
+                   array[1]=cont;array[2]=numeric1;array[5]=numeric2;array[7]=1;//subvial(c);//caso eje x
+                  break;    
+              default: 
+                 
+            }
+           
+              
+        }
+    cont++;  
+   }  
+   if((array[4]=="")&&(array[1].equals(0))){array[4]=2;};if((array[4]=="")&&(array[1].equals(1))){array[4]=2;}  
+   if((array[1]=="")&&(array[4].equals(2))){array[1]=0;};if((array[1]=="")&&(array[4].equals(3))){array[1]=0;}
+   if((array[1]=="")&&(array[4]=="")){array[1]=0;array[4]=0;}
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+  //HASTA AQUI BUSCA EN LOS PRIMERAS SUBACADENAS SI INICIA POR CL O CR PERO FALTA DEFINIR CUANDO SE ESCRIBE CL-TV CR-DG
+  int point2,caso = 0; if (numeric1.equals(numeric2)){point2 = c.lastIndexOf("."+numeric2+".");}else{
+  point2 = c.indexOf("."+numeric2+".");}
+  String q2 = c.substring(point, point2+1);
+  if ((q2.contains("cl"))||(q2.contains("dg"))||(q2.contains("cr"))||(q2.contains("tv"))){
+   //JOptionPane.showMessageDialog(null,q2+"#"+match);//array[4]=buscarV(q2,base);
+          if (buscarV(match,base)==buscarV(q2,base)){//primer caso: si son iguales omitir el segundo caso 
+               if (buscarV(match,base)<2){array[7]=1;}else{array[7]=0;};  //CASO CARDINALES REPETIDOS  
+          }else{
+            caso=buscarV(match,base);
+                     switch(caso){//AUN HACE FALTA COMPLETAR EL PROCESO SUBVIAL EN ESTOS CASOS NO COMUNES
+                 case 0:
+                     array[4]=buscarV(q2,base);//CASO INICIA POR CALLE
+                     break;
+                 case 1: 
+                     //CASO INICIA POR DIAGONAL---INTERCALAR
+                     if(buscarV(q2,base)==0){array[7]=1;//con calle
+                     array[1]=buscarV(q2,base);array[4]=buscarV(match,base);array[2]=numeric2;array[5]=numeric1;
+                      
+                     }else{
+                        array[4]=buscarV(q2,base);
+                     }
+                     break;
+                 case 2: 
+                     if((buscarV(q2,base)<=1)){array[1]=buscarV(q2,base);array[2]=numeric2;
+                     array[4]=buscarV(match,base);array[5]=numeric1;array[7]=buscarV(q2,base);
+                    } else{
+                      array[1]=buscarV(match,base);array[2]=numeric1;array[4]=buscarV(q2,base);array[5]=numeric2;
+                      array[7]=buscarV(q2,base);}
+                      
+                     break; 
+                 case 3:
+                     if ((buscarV(q2,base)==2)){
+                       array[1]=buscarV(q2,base);array[5]=numeric1;array[4]=buscarV(match,base);array[2]=numeric2;array[7]=buscarV(q2,base);  
+                         }else{
+                         array[1]=buscarV(q2,base);array[2]=numeric2;
+                         array[4]=buscarV(match,base);array[5]=numeric1;array[7]=buscarV(q2,base);
+                     }
+                     break;
+                 case 4:
+
+                     break;
+                }
+          }         
+   }
+ ///////////////////////FIN DE LOS SUBCASOS ////////////////////////////// 
+}
+    private void subcardinal(String s){//PARA CASOS ESPECIALES QUE CONTIENEN LA PALABRA BIS: EN ESTE CASO ADICIONA 0.5 AL CARDINAL
+       int control=0,q,x; final int subc = 20;
+      if (array[3]==null){array[3]=0;}  if(array[6]==null){array[6]=0;}
+       q = (int)array[3];
+       x=(int)array[6];
+        if (s.contains(".bis.")){
+          if (numeric1.equals(numeric2)){control = s.lastIndexOf("."+numeric2+".");}else{control = s.indexOf("."+numeric2+".");} 
+          
+          int control2 = s.indexOf(".bis.");
+              //JOptionPane.showMessageDialog(null, array[7]);
+             if(array[7].equals(1)){
+                         if (control2<control){
+                                array[3]= q + subc;// JOptionPane.showMessageDialog(null, "3");// array[3]
+                               }else{
+                                array[6]= x + subc; //JOptionPane.showMessageDialog(null, "6");// array[6]
+                         }
+               }else{
+                         if (control2>control){
+                                 array[3]= q + subc;//JOptionPane.showMessageDialog(null, "6");// array[6]
+                               }else{
+                                 array[6]= x + subc;// JOptionPane.showMessageDialog(null, "3");// array[3]
+                         }
+             }
+        
+        }
+    }//evaluar manera no cuadra
+    public void subvial (String st){
+    String base = "#abcdefghijklmprstuv";//debemos tener en cuenta la nomenclatura BIS que marca una diferenciacion vial SE EXCLUYE  N, Ñ, O, W
+   int control,posicion_numeric;
+   if(contnum>=3){
+    st=cadena3num+".";
+  posicion_numeric=st.lastIndexOf("."+numeric3+".");st=st.substring(0,posicion_numeric)+".";//limitamos la busqueda hasta la ultima posicion numerica evitando casos de expresiones muy largas
+   }else{}
+   //JOptionPane.showMessageDialog(null, st);
+   if (numeric1.equals(numeric2)){control = st.lastIndexOf("."+numeric2+".");}else{control = st.indexOf("."+numeric2+".");} 
+          
+    switch(contLetra1digito){
+        case 0:
+            array[3]=0;array[6]=0;
+          break; 
+        case 1:
+            if(array[7].equals(1)){
+                if ((st.indexOf("."+letraabc[0]+".")<control)){//(st.indexOf("."+letraabc[0]+".")<control)
+                    array[3]=base.indexOf(letraabc[0]);array[6]=0;}else{
+                    array[3]=0;array[6]=base.indexOf(letraabc[0]);   
+                  }
+            }else{
+                if ((st.indexOf("."+letraabc[0]+".")>control)){//(st.indexOf("."+letraabc[0]+".")<control)
+                    array[3]=base.indexOf(letraabc[0]);array[6]=0;}else{
+                    array[3]=0;array[6]=base.indexOf(letraabc[0]);    
+                  }
+            }
+          break;
+        case 2:
+            if (("n".equals(letraabc[0]))){letraabc[0]="";}
+            if(array[7].equals(1)){
+            array[3]=base.indexOf(letraabc[0]);array[6]=base.indexOf(letraabc[1]);}else{
+             array[6]=base.indexOf(letraabc[0]);array[3]=base.indexOf(letraabc[1]);
+            }
+          break;
+        default:  
+    }
+    if ((int)array[3]==-1){array[3]=0;}if ((int)array[6]==-1){array[6]=0;}//SIN AL FINAL NO SE ENCONTRO SUBVIAL LO PASA DE -1 A 0
+    //JOptionPane.showMessageDialog(null,array[3]+"#"+array[6]);
+    //st.indexOf(numeric1);
+    
+}//evaluar cuando el numero2 es igual al numero3 no calcula bien
+private void subVia(String s){
+   try{ 
+    int control = contLetra1digito,cont=0;int point;String cadena1,cadena2;
+    int match1 = -1,match2 = -1,letra1 = 0,letra2 = 0;String z= cadenaq1+cadenaq2;
+    point = z.indexOf("."+numeric1+".");//buscamos descomponer la cadena en dos partes SE EXCLUYE  N, Ñ, O, W
+      String base[] = {"cl","dg","cr","tv"}; String baseabc = "#abcdefghijklmprstuv"; 
+        cadenaq2=cadenaq2+"."; 
+     cadena1=cadenaq1;
+     cadena2=z.substring(point,z.length());
+    if ((cadena2.contains("cl"))||(cadena2.contains("dg"))||(cadena2.contains("cr"))||(cadena2.contains("tv"))){
+    //DESDE AQUI PROCESA SI ADEMAS DE DEFINIR EL EJE X TAMBIEN CONTIENE EL EJE Y
+    if (control<1){
+          
+        }else{
+          switch(control){
+            case 1:
+        match1=buscarV(cadena1, base);if(cadenaq1.contains("."+letraabc[0]+".")){letra1=baseabc.indexOf(letraabc[0]);}else{letra1=0;}
+        match2=buscarV(cadena2, base);if(cadenaq2.contains("."+letraabc[0]+".")){letra2=baseabc.indexOf(letraabc[0]);}else{letra2=0;}
+       // JOptionPane.showMessageDialog(null, match1+"#"+letra1+"\n"+match2+"#"+letra2);
+               break;
+            case 2:
+        match1=buscarV(cadena1, base);if(cadenaq1.contains("."+letraabc[0]+".")){letra1=baseabc.indexOf(letraabc[0]);}else{letra1=0;}
+        match2=buscarV(cadena2, base);if(cadenaq2.contains("."+letraabc[1]+".")){letra2=baseabc.indexOf(letraabc[1]);}else{letra2=0;}
+       // JOptionPane.showMessageDialog(null, match1+"#"+letra1+"\n"+match2+"#"+letra2);
+                break;
+           }//fin switch  
+    }//fin if
+    if (match1==match2){
+        subvial(s);
+    }else{
+    if(match1==(int)array[1]){array[3]=letra1;}if(match2==(int)array[4]){array[6]=letra2;}
+    if(match1==(int)array[4]){array[6]=letra1;}if(match2==(int)array[1]){array[3]=letra2;}
+    
+    }
+   }else{
+      //////////////////////////DESDE AQUI COMIENZA PROCESAMIENTO SI SOLO DEFINE UN EJE Y SE ASUME LA REGLA DEL EJE OPUESTO  
+       subvial(s);
+       
+    }
+    if (array[3]==null){array[3]=0;}if (array[6]==null){array[6]=0;}
+    if ((int)array[3]==-1){array[3]=0;}if ((int)array[6]==-1){array[6]=0;}//SIN AL FINAL NO SE ENCONTRO SUBVIAL LO PASA DE -1 A 0
+     }
+   
+    catch(Exception e){
+      array[0]=-1;
+    } 
+}
+public String especialcase (String e){
+    int s = -1;
+    if(("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=0;}
+    if(("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==0)){s=1;}
+    if((e.contains("av."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=2;}
+    if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
+    if((e.contains("km."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=0)){s=4;}//casos con kilometro
+    if (("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==2)){s=5;}//caso 
+    if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
+    if (("vialExtra".equals(sintaxis))){s=7;}//casos con mas de 2 letras para determinar subvia
+    ////////////espacio para otros casos
+    if (("null".equals(sintaxis))&&(contnum==0)){s=9;}//dejar este como ultimo caso con cero numeros y todas
+    if (("null".equals(sintaxis))&&(contnum==1)){s=10;}//dejar este como ultimo caso con cero numeros y todas 
+      switch(s){
+          case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
+          array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
+              break;
+          case 1:e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
+          array[0]=200; if (e.contains(".cl.")==true){array[2]=0;} if (e.contains(".dg.")==true){array[2]=1;}
+          if (e.contains(".cr.")==true){array[5]=2;} if (e.contains(".tv.")==true){array[5]=3;} 
+              break;
+          case 2://casos de avenidas
+               if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
+                 e= buscarList(e)+ e;
+                 coordenada(e);
+                 cardinal(e);
+                 subcardinal(e);
+                 subVia(e);
+              codigo();
+               }else{
+                     array[2]=numeric1;array[5]=numeric2;array[7]=1;
+                     e=sintax(cadena3num);
+                     coordenada(e);
+                     subvial(e);
+                   }
+              break; 
+          case 3:
+               if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
+                 e= buscarList(e)+ e;//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
+                  coordenada(e);cardinal(e);subcardinal(e);subVia(e);
+              codigo();
+                }else{
+                     String segment[] = textIni.split(" ");
+                   e="ErrXY: "+arrayTostring(segment);
+              
+                   }
+              break;
+          case 4://AQUI COTEJAMOS LOS CASOS QUE LLEVAN EL INDICADOR KM KILOMETRO CODIGO 400
+             array[0]=400;array[2]=numeric1;array[3]=numeric2;array[4]=numeric3;array[8]=0; //JOptionPane.showMessageDialog(null, "si");
+              break;
+          case 5://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
+             cardinal(e);array[0]=500;
+              break; 
+          case 6://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
+             String nuevoText=invertir(e);inicomponentes();
+             texting(nuevoText);
+              break; 
+          case 7:
+              int pointA=-1,pointB=-1,pointC=-1,pointD=-1,pointN1=-1,pointN2=-1;
+              String cadena=vectorabc.substring(1, vectorabc.length());
+              String subviales[] = cadena.split(",");
+              String segmentos[] = e.split("\\.");
+       if(subviales.length==3) {
+           pointA = Arrays.asList(segmentos).indexOf(subviales[0]);
+           pointB = Arrays.asList(segmentos).indexOf(subviales[1]);
+           pointC = Arrays.asList(segmentos).indexOf(subviales[2]);
+           pointN1=Arrays.asList(segmentos).indexOf(numeric1);
+           pointN2=Arrays.asList(segmentos).indexOf(numeric2);
+       }           
+        ///////RESOLVER POR CASOS/////////////////////////////////////////////////
+     if ((pointA-pointB==-1)&&("e".equals(subviales[1]))){segmentos[pointB]="este";//si caso "e" ubicado despues de pointA representa eñ "este"   
+     e=arrayTostring(segmentos);inicomponentes();
+         e = alfanumeric(e);e = sintax(e); expresion(e); coordenada(e);cardinal(e);subcardinal(e);subVia(e);codigo(); 
+     }
+                           
+              break;
+              
+          case 9:
+              String segment[] = textIni.split(" ");
+              e="Rural: "+arrayTostring(segment);
+              break;
+          case 10:
+              e=e;array[8]=numeric1;
+              break;    
+          default:
+            
+              e="Error:";
+              break;
+          }
+      return e;
+}
+////////////////////////FUNCIONES DE VALIDACION Y OTRAS UTILIDADES//////////////////////////////////////////////////////////////////
+public String codigo (){
+        String codigo = "";
+    for (int i=0;i<10;i++){
+        if((array[i]==null)){array[i]=0;}else{}
+    } 
+//ANTES DE ARROJAR EL CODIGO SE COTEJAN MODIFICACIONES ESPECIALES COMO EL CASO DE NOMENCLATURAS(CL X DG Z) DONDE SE REQUIERE HACER AJUSTES        
+
+    
+
+//GENERAMOS EL ID DIRECCION COMPUESTO DE 9 SECCIONES QUE REPRESENTAN COMPONENTES DE UBICACION CARTESIANA
+        codigo = array[0].toString()+"."+ //REPRESENTA COORDENADA NORTE SUR ESTE OESTE
+                 array[1].toString()+"."+array[2].toString()+"."+array[3]+"."+//REPRESENTA EJE X CALLE 
+                 array[4].toString()+"."+array[5].toString()+"."+array[6]+"."+//REPRESENTA EJE Y CARRERA
+                 array[7].toString()+"."+array[8].toString();//+""+//REPRESENTA NUMERO DE CASA Y UBICACION SOBRE EJE X O EJE Y + NUMERO DE PISO O APARTAMENTO
+                 //array[9];
+        //GENERAMOS EL CODIGO DE CUADRANTE PREVIO A LA ZONOFICACION
+             array[11]=array[2]+"."+array[5];
+//GENERAMOS EL VALOR NUMERICO PARA FACILITAR EL ORDENAMIENTO
+        valor=generarValor();
+        //valor= Double.parseDouble(array[0]+"."+array[1]+array[2]+array[3]+array[4]+array[5]+array[6]+array[7]+array[8]);
+            return codigo;
+    }//GENERA EL ID DIRECCION PREVIO A PROCESAR LAS ZONAS
+  public double generarValor(){
+      double result;String mascalle,maskr,masnumcasa;
+      
+      mascalle= llenarceros( array[2].toString(),3);
+      
+      if (array[5].equals(0)){maskr="0";}{
+         maskr=llenarceros((String) array[5].toString(),3);}
+      
+      if (array[8].equals(0)){masnumcasa="0";}else{
+          masnumcasa=llenarceros((String) array[8].toString(),3);}
+      //valorentero = Double.parseDouble(array[0]+"."+array[1]);
+      //String r = array[0]+"."+array[1]+mascalle+array[3]+array[4]+maskr+array[6]+array[7]+masnumcasa;//mascalle=Double.parseDouble(array[2]+"."+array[3])*0.001;
+     result=Double.parseDouble(array[0]+"."+array[1]+mascalle+array[3]+array[4]+maskr+array[6]+array[7]+masnumcasa);//mascalle+array[3]+array[4]+maskr+array[6]+array[7]+masnumcasa);
+      
+        return result;
+      
+  }
+ //<editor-fold defaultstate="collapsed" desc="Generated Code Funciones y Utilidades"> 
+    private String arrayTostring(String array[]){
+       String result="",acum="";
+       for(String sub:array) {
+           acum=acum+"."+sub;
+       }
+        result= acum.substring(1, acum.length())+".";
+        return result;
+    }
+    private String llenarceros(String text,int numCeros){
+        String result;int largo=0;
+        largo = numCeros-text.length();
+        for(int cont=0;cont<largo;cont++){
+            text="0"+text;
+        }
+        result=text;
+        return result;
+    } 
+   private String corregirText(String exp, String segmentos[]){
+       String result="";int largo=0;
+      ///comenzamos por el inicio de las cadenas casos posicion cero
+      largo = segmentos[0].length();
+       switch(segmentos[0]){
+          case "k":
+             result=  exp.replaceFirst("k.", "cr.");
+               break;
+           case "c":
+            result=  exp.replaceFirst("c.", "cl.");   
+               break;
+           case "avn":
+            result=  exp.replaceFirst("avn.", "av.");   
+               break;
+           case "tranv":
+            result=  exp.replaceFirst("tranv.", "tv.");   
+               break;
+          case "tran":
+            result=  exp.replaceFirst("tran.", "tv.");   
+               break;     
+           case "crr":
+            result=  exp.replaceFirst("crr.", "cr.");   
+               break;
+           case "car":
+            result=  exp.replaceFirst("car.", "cr.");   
+               break; 
+           case "carr":
+            result=  exp.replaceFirst("carr.", "cr.");
+               break;     
+            case "cll":
+            result=  exp.replaceFirst("cll.", "cl.");
+               break;    
+           default:
+               break;
+       
+       }
+       //JOptionPane.showMessageDialog(null, segmentos[0]);
+       return result;
+   } 
+   public boolean isnumeric(String text){
+        boolean bool = text.matches("[0-9]*");
+        return bool;
+    }
+    public boolean isletra(String text){
+        boolean bool = text.matches("[a-zA-Z]*");
+        return bool;
+    }
+    private boolean buscar(String text, String matriz){
+        boolean bool = false;int cont=0;String base [] = matriz.split(",");
+        for (String base1 : base) {
+         if (text.equals(base[cont])){
+           bool=true;//JOptionPane.showMessageDialog(null, "");
+           
+                                           }
+                 cont++;
+                             }
+        return bool;
+    }
+    private int buscarV(String text, String matriz[]){
+       int result=0;int cont=0;//String base [] = matriz[];
+        for (String base1 : matriz) {
+            int match=text.indexOf("."+matriz[cont]+".");
+            
+         if ((match>-1)){
+           result=cont;//JOptionPane.showMessageDialog(null, "");
+           
+                                           }
+                 cont++;
+                             }
+        return result;
+    }
+    private String buscarList(String text){
+      String result="null"; String texto;
+        Iterator<String> it= ListaDirecciones.dirs.iterator();
+        while(it.hasNext()) {//for (int i=0; i<=largo;i++) {
+          texto = it.next();
+          if (texto != null){
+             String array[] = texto.split(",");
+               if (text.contains(array[0])){result=array[1];}
+     
+                                       }
+                 
+                             }
+        return result;
+    }
+    private String matchText(String cadena,String lista){
+       String acum="";//subfuncion usada en la funcion expresion()
+        ArrayList<String> myList = new ArrayList<String>(Arrays.asList(lista.split(",")));
+           StringTokenizer token = new StringTokenizer(cadena,".");String sub,valor = null;int match=0,cont=0;
+              while (token.hasMoreTokens()){
+                  sub = (token.nextToken());
+                  match=myList.indexOf(sub);
+                  if ((match>-1)&&(cont<=2)){
+                    if(sub.equals(myList.get(match))){ acum=acum+"."+sub;}//{ result[cont]=sub;cont++; }modificado
+                  }
+              }
+        if (acum==""){}else{     
+        String result[]=acum.split("\\.");
+        if ("".equals(result[1])){cardinal1="";}else{cardinal1=result[1];}if((result.length<3)){}else{
+        if (result[2].isEmpty()){cardinal2="";}else{cardinal2=result[2];}}//JOptionPane.showMessageDialog(null,result[1]);
+        valor= result[1];
+        }
+        return valor;
+    } 
+    private String invertir(String i){//INVIERTE LA CADENA SI LA NOMENCALTURA EMPIEZA POR EL COMPLEMENTO Y DESPUES LOS CARDINALES
+        String cardinal,subcadena,subcadena2,result;int point = 0,fin= i.length();//int numero1,numero2,numero3;
+       // numero1=Integer.parseInt(numeric1);numero2=Integer.parseInt(numeric2);numero3=Integer.parseInt(numeric3);
+        cardinal=cardinal1;point = i.indexOf("."+cardinal+".");
+        subcadena=i.substring(0,point);subcadena2=i.substring(point, fin);result=subcadena2+"."+subcadena;
+        //JOptionPane.showMessageDialog(null,subcadena);
+        return result;
+    }
+    private String generarCadena3num(String txt){
+        int contnumeros=0;String acumulador=".",cola=".";String sub="";
+        StringTokenizer token = new StringTokenizer(txt,".");
+              while (token.hasMoreTokens()){
+                  sub = (token.nextToken());
+                  if (contnumeros<3){acumulador=acumulador+"."+sub;}else{cola=cola+"."+sub;}
+                  if (isnumeric(sub)==true){contnumeros++;}    
+              }
+      acumulador= acumulador.replace("..", ".");       
+       return acumulador;       
+    }
+ // </editor-fold>       
+}
+///////////////FUNCIONES CON MANEJO DE FICHEROS EXPORTACION E IMPORTACION
+class ListaDirecciones{
+    static String dir;
+    static ArrayList<String> dirs = new ArrayList<String>() ; 
+    static ArrayList<String> dirsPrevias = new ArrayList<String>();
+    static ArrayList<String> expresionResult = new ArrayList<String>();
+    static String checklist;
+    public  void FileTextRead() throws IOException {//FUNCION IMPORTAR BASE DE VIAS CON NOMBRES PARTICULARES
+    String file=null; 
+
+    String ruta = System.getProperty("user.dir");   
+    FileReader myFile = null;
+    file =ruta+"\\direcciones.txt";  
+     File af = new File(file);            
+      if (af.isFile()==false){ListaDirecciones.checklist = "Archivo no Encontrado";//JOptionPane.showMessageDialog(null,"No se cargaron fuentes de datos");
+      
+      }else{
+    try {
+                //Crear un objeto File con el archivo elegido
+               // File archivoElegido = fc.getSelectedFile();
+                //Mostrar el nombre del archvivo en un campo de texto
+      
+           
+    myFile = new FileReader(file);
+      //JOptionPane.showMessageDialog(null,myFile);
+    BufferedReader InputFile = new BufferedReader(myFile);
+    // Read the first line
+    String currentRecord = InputFile.readLine();
+     dirs.add(currentRecord);
+    while(currentRecord != null) {
+
+    try {
+    //Copio un valor a la celda 
+    //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
+    currentRecord = InputFile.readLine();
+    if (currentRecord != ""){
+       dirs.add(currentRecord);
+    }
+
+    //jTextField1.setText();//Refresco la Tabla 
+    //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
+
+    }
+    catch (Exception ex) {
+    }
+    }
+    //JOptionPane.showMessageDialog(null,"Base de direcciones cargada");
+      ListaDirecciones.checklist = "Base de direcciones Cargadas";
+     
+
+    } catch (FileNotFoundException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    } finally {
+
+        try {
+    myFile.close();
+
+    } catch (IOException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+            }//fin del if
+          /*  }//fin del if 
+           else{
+             JOptionPane.showMessageDialog(null,"Proceso Cancelado");
+            }*/
+
+    }
+    //FUNCION PARA IMPORTAR LISTA DE DIRECCIONES A PROCESAR
+    public  void importar() throws IOException {//FUNCION IMPORTAR BASE DE VIAS CON NOMBRES PARTICULARES
+    int i = 0;String file=null;
+    ///////////////// codigo que invoca la clase para procesar las direcciones
+     descomponer d; //= new descomponer();
+    
+     ///////////////////////////////////////////////////////////////////////////////////////////////
+    JFileChooser fc = new JFileChooser();
+    int respuesta = fc.showOpenDialog(fc); 
+            //Comprobar si se ha pulsado Aceptar
+    if (respuesta == JFileChooser.APPROVE_OPTION) {
+    FileReader myFile = null;
+    try {
+                //Crear un objeto File con el archivo elegido
+                File archivoElegido = fc.getSelectedFile();
+                //Mostrar el nombre del archvivo en un campo de texto
+    // JOptionPane.showMessageDialog(rootPane, archivoElegido.getAbsoluteFile());// txtNombre.setText(archivoElegido.getName()); 
+           file =archivoElegido.getAbsoluteFile().toString();      
+    //Leo un Archivo de Texto
+    //String file = "C:/pregeo.txt";
+    myFile = new FileReader(file);
+    BufferedReader InputFile = new BufferedReader(myFile);
+    // Read the first line
+    String currentRecord = InputFile.readLine();
+     dirsPrevias.add(currentRecord);
+    while(currentRecord != null) {
+        d = new descomponer();
+    try {
+    //Copio un valor a la celda 
+    //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
+    currentRecord = InputFile.readLine();
+    expresionResult.add(d.texting(currentRecord)+"|"+d.codigo());
+    if (currentRecord != ""){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
+       dirsPrevias.add(currentRecord);i++;
+    }
+
+    //jTextField1.setText();//Refresco la Tabla 
+    //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
+
+    }
+    catch (Exception ex) {
+    }
+    }
+    JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
+    //checklist = " "+i+" Registros";
+
+    } catch (FileNotFoundException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    } finally {
+
+        try {
+    myFile.close();
+
+    } catch (IOException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+            }//fin del if 
+           else{
+             JOptionPane.showMessageDialog(null,"Proceso Cancelado");
+            }
+
+    }
+}
+
+class dirTest{
+    static ArrayList<String> direcciones;// = new ArrayList<String>() ;
+    static List<idDirZona> listaDirecciones ;//= new ArrayList<idDirZona>();
+public void importarDirTest() throws IOException{
+     int i = 0;String file=null;
+    ///////////////// codigo que invoca la clase para procesar las direcciones
+     clearFile();//limpiamos el archivo donde se guardan los resultados si existe
+    direcciones = new ArrayList<String>() ;
+    listaDirecciones = new ArrayList<idDirZona>();
+     ///////////////////////////////////////////////////////////////////////////////////////////////
+    JFileChooser fc = new JFileChooser();
+    int respuesta = fc.showOpenDialog(fc); 
+            //Comprobar si se ha pulsado Aceptar
+    if (respuesta == JFileChooser.APPROVE_OPTION) {
+    FileReader myFile = null;
+    try {
+                //Crear un objeto File con el archivo elegido
+                File archivoElegido = fc.getSelectedFile();
+                //Mostrar el nombre del archvivo en un campo de texto
+    // JOptionPane.showMessageDialog(rootPane, archivoElegido.getAbsoluteFile());// txtNombre.setText(archivoElegido.getName()); 
+           file =archivoElegido.getAbsoluteFile().toString();      
+    //Leo un Archivo de Texto
+    //String file = "C:/pregeo.txt";
+    myFile = new FileReader(file);
+    BufferedReader InputFile = new BufferedReader(myFile);
+    // Read the first line
+    String currentRecord = InputFile.readLine();
+      
+     direcciones.add(currentRecord);
+    while(currentRecord != null) {
+        //d = new descomponer();
+    try {
+    //Copio un valor a la celda 
+    //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
+    currentRecord = InputFile.readLine();
+   
+    if (currentRecord != ""){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
+       // descomponer d = new descomponer();String result=d.texting(currentRecord);String value=d.codigo();
+       direcciones.add(currentRecord);i++;//exportar_datos(String.valueOf(i)+"#"+currentRecord);
+    }
+
+    //jTextField1.setText();//Refresco la Tabla 
+    //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
+
+    }
+    catch (Exception ex) {
+    }
+    }
+    JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
+    //checklist = " "+i+" Registros";
+
+    } catch (FileNotFoundException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    } finally {
+
+        try {
+    myFile.close();
+
+    } catch (IOException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+            }//fin del if 
+           else{
+             JOptionPane.showMessageDialog(null,"Proceso Cancelado");
+            }
+
+    }
+public void procesarLista( ) throws IOException{
+    ArrayList<String> l = (ArrayList<String>) direcciones.clone();
+    String cadena = null,codigo = null;descomponer d;
+    
+ try{   
+     if (l.isEmpty()) { 
+           JOptionPane.showMessageDialog(null, "No Data Test");
+       }else{
+       // int size = l.size();//COMIENZA A EXPORTAR DATOS
+        for (String sub : l){//for (int i=0;i<= size;i++){
+           if (sub==null){ }else{
+             d = new descomponer();  cadena=d.texting(sub);codigo=d.codigo();
+            //JOptionPane.showMessageDialog(null, sub+"#\n"+cadena+"#\n"+codigo);i++;
+           exportar_datos(sub+"|"+cadena+"|"+codigo+"|"+d.valor);//LINEA QUE EXPORTA LOS DATOS PROCESADOS
+           listaDirecciones.add(new idDirZona(sub, cadena, codigo,d.valor)); } //CREA UN OBJETO Y GUARDA LOS ELEMENTOS EN MEMORIA PARA USO EN OTRAS CLASES
+           //Collections.sort(listaDirecciones,new CompararIdZonas());//LINEA QUE ORDENA LAS DIRECCIONES POR CALLE Y CARRERA FALTA NUMERO
+           
+         }
+        
+        JOptionPane.showMessageDialog(null,"Proceso Finalizado");
+      }//end if
+ }
+    catch(IOException e){
+    JOptionPane.showMessageDialog(null, "error");
+    } 
+ 
+}
+ public void exportar_datos(String valor) throws IOException {
+
+     try{
+         String strPath = System.getProperty("user.home");
+        String f = strPath+"\\Documents\\result.txt";
+        File file = new File(f); 
+    //FileOutputStream fis = new FileOutputStream(f);
+    if (!file.exists()) {
+                file.createNewFile();
+            }
+    
+    FileWriter  dos=new FileWriter(f,true);//FileWriter  dos=new FileWriter(f,true);
+    
+    
+    dos.write((valor==null)?"null":valor);
+    dos.write("\n");
+
+    //i=i+1;
+    //}
+    //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
+    dos.close();
+    }
+    catch(FileNotFoundException e){
+    System.out.println("No se encontro el archivo");
+    }
+    catch(IOException e){
+    JOptionPane.showMessageDialog(null, "error");
+    }
+ }
+ private void clearFile() throws IOException{
+     String strPath = System.getProperty("user.home");
+        String f = strPath+"\\Documents\\result.txt";
+    // String f = "C:\\Users\\57321\\Documents\\bases\\result.txt";
+     File file = new File(f);
+     //FileOutputStream fis = new FileOutputStream(f);
+     if (file.exists()) {
+         PrintWriter  dos=new PrintWriter(f);
+         dos.print("");dos.close();
+     }else{}
+ }
+}
+
+class ciudades{
+    static ArrayList<String> ciudades;
+    static Map <String ,String> mapCiud = new HashMap<String, String> ();
+    static int ciudadGlobal;
+     public  void importCiudades() throws IOException {//FUNCION IMPORTAR BASE DE VIAS CON NOMBRES PARTICULARES
+    String file=null; 
+    ciudades = new ArrayList<String>();
+    String ruta = System.getProperty("user.dir");   
+    FileReader myFile = null;
+    file =ruta+"\\ciudades.txt";  
+     File af = new File(file);            
+      if (af.isFile()==false){ListaDirecciones.checklist = "Archivo no Encontrado";//JOptionPane.showMessageDialog(null,"No se cargaron fuentes de datos");
+      
+      }else{
+    try {
+                //Crear un objeto File con el archivo elegido
+               // File archivoElegido = fc.getSelectedFile();
+                //Mostrar el nombre del archvivo en un campo de texto
+      
+           
+    myFile = new FileReader(file);
+      //JOptionPane.showMessageDialog(null,myFile);
+    BufferedReader InputFile = new BufferedReader(myFile);
+    // Read the first line
+    String currentRecord = InputFile.readLine();
+     ciudades.add(currentRecord);
+    while(currentRecord != null) {
+
+    try {
+    //Copio un valor a la celda 
+    //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
+    currentRecord = InputFile.readLine();
+    if (currentRecord != ""){
+       ciudades.add(currentRecord);
+    }
+
+    //jTextField1.setText();//Refresco la Tabla 
+    //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
+
+    }
+    catch (Exception ex) {
+    }
+    }
+    //JOptionPane.showMessageDialog(null,"Base de direcciones cargada");
+      ListaDirecciones.checklist = "Base de direcciones Cargadas";
+     
+
+    } catch (FileNotFoundException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    } finally {
+
+        try {
+    myFile.close();
+
+    } catch (IOException ex) {
+    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    }
+            }//fin del if
+          /*  }//fin del if 
+           else{
+             JOptionPane.showMessageDialog(null,"Proceso Cancelado");
+            }*/
+
+    }
+ 
+     
+    
+}

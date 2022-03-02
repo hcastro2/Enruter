@@ -174,6 +174,9 @@ public class descomponer {
       if (segmentos[0].contains("car")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("cll")){result=corregirText(texto,segmentos);}
       if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))){result=corregirText(texto,segmentos);}
+     //JOptionPane.showMessageDialog(null,buscarH("ca", segmentos));
+      if((buscarH("ca", segmentos)>-1)&&(texto.contains("mz"))){
+         segmentos[buscarH("ca", segmentos)]="cs";   result=arrayTostring(segmentos) ;}
       if("".equals(result)){result=texto;}//si no encuentra correccion devuelve el texto completo
        return result;
                                         }
@@ -627,17 +630,24 @@ public String especialcase (String e){
           case 8: //CASO DE MANZANAS 
             int pointMz=-1,pointCs=-1;String numMz,numCs;  
               String segmentos2[] = e.split("\\."); String baseabc = "#abcdefghijklmnopqrstuvwxyz";
+              //////////////PRIMERO BUSCAMOS NUMERO DE CASA////////////////////////////
               pointMz = Arrays.asList(segmentos2).indexOf("mz");
+              if((segmentos2[pointMz].length()==2)&&("mz".equals(segmentos2[pointMz]))&&(pointMz+1<segmentos2.length)){
+                   numMz= (pointMz==-1)?"":segmentos2[pointMz+1];
+                   if(isnumeric(numMz)==true){array[7]=numMz;}else{array[7]=baseabc.indexOf(numMz); }
+                    if( "-1".equals(array[7].toString())){array[7]=0;}
+              }else{array[7]=0;}
+              //////////////SEGUNDO NUMERO DE CASA//////////////////////////////////////
               pointCs= Arrays.asList(segmentos2).indexOf("cs");
-              numMz= (pointMz==-1)?"":segmentos2[pointMz+1];
-              numCs= (pointCs==-1)?"": segmentos2[pointCs+1];  
-              if((segmentos2[pointMz].length()==2)&&(segmentos2[pointCs].length()==2)){
-              if(isnumeric(numMz)==true){array[7]=numMz;}else{array[7]=baseabc.indexOf(numMz); }
-              if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]=""; }
-                 if( "-1".equals(array[7].toString())){array[7]=0;}//if( Integer.parseInt((String)array[8])==-1){array[8]=0;}
-              }else{
-                e="ErrMz: "+arrayTostring(segmentos2);
-              }
+             if((segmentos2[pointCs].length()==2)&&("cs".equals(segmentos2[pointCs]))&&(pointCs+1<segmentos2.length)){
+              numCs= (pointCs==-1)?"": segmentos2[pointCs+1];
+                if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]="0"; }
+                
+              }else{array[8]="0";}
+             
+             if((segmentos2[pointMz].length()>2)&& (segmentos2[pointCs].length()>2)){
+             e="ErrMz: "+arrayTostring(segmentos2);}
+              
               
               break;
           case 9:
@@ -743,7 +753,7 @@ public String codigo (){
                break;     
             case "cll":
             result=  exp.replaceFirst("cll.", "cl.");
-               break;    
+               break;
            default:
                break;
        
@@ -781,6 +791,17 @@ public String codigo (){
                                            }
                  cont++;
                              }
+        return result;
+    }
+    private int buscarH(String text, String matriz[]){
+       int result=-1;int cont=0;//String base [] = matriz[];
+        for (String base1 : matriz) {
+                        
+         if ((base1.equals(text))){
+           return cont;//JOptionPane.showMessageDialog(null, "");
+             }
+                 cont++;
+       }
         return result;
     }
     private String buscarList(String text){

@@ -686,6 +686,7 @@ public static void runing(){
         // ajustaricon();//muestra gif de procesando
          // ex.importExcel();// TODO add your handling code here:
           ex.importExcel();
+           descomponer.exportar_TextBasura(descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
@@ -708,6 +709,7 @@ public static void runing(){
           Excel ex = new Excel();
   
           ex.importCsv();
+         descomponer.exportar_TextBasura(new String(descomponer.garbagColect.getBytes("ISO-8859-1"), "UTF-8"));// JOptionPane.showMessageDialog(null,descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }

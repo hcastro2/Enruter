@@ -187,7 +187,7 @@ public  void importCsv() throws IOException {
          String line = br.readLine();
          while (null!=line) {
             String [] fields = line.split(SEPARATOR);
-            System.out.println(filcont+""+Arrays.toString(fields));
+      //      System.out.println(filcont+""+Arrays.toString(fields));
             if(filcont==0){encabezados=line;}//GENERAMOSENCABEZADOS
             if (filcont>0){//con encabezados procesa desde la fila 1
              //JOptionPane.showMessageDialog(null,fields[0]); //columna 1

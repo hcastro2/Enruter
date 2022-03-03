@@ -1,12 +1,17 @@
 package enruter;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
@@ -27,7 +32,7 @@ import javax.swing.JFileChooser;
 public class descomponer {
 // la idea es tomar el texto original y eliminar los posibles errores y particularidades del lenguaje comun    
     public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
-    String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni;
+    String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni,garbagColect="";
     String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cardinal1,cardinal2;
   
   public void inicomponentes() {
@@ -75,7 +80,7 @@ public class descomponer {
         texto = texto.trim();texto=texto.replace("N°","#");texto=texto.replace("¥","");texto=texto.replace("NË"," ");
         texto=texto.replace("N?"," ");texto=texto.replace(" NÉ "," ");texto=texto.replace(" N` "," ");texto=texto.replace(" N§ "," ");
         texto=texto.replace(" Nø "," ");texto=texto.replace(" ?Ñ "," ");texto=texto.replace(" NÂ° "," ");
-        texto=texto.replace("?","#");texto=texto.replace("æ"," ");texto=texto.replace("N§"," ");
+        texto=texto.replace("?","#");texto=texto.replace("æ"," ");texto=texto.replace("N§"," ");texto=texto.replace("\\"," ");
         texto = texto.replaceAll("[#-/_]", " ");//caracteres especiales que se reemplazan por espacio
         texto = texto.replaceAll("[–.,;:·]", " ");texto = texto.replaceAll("  ", " ");
         texto = Normalizer.normalize(texto, Normalizer.Form.NFD);           ///  ESTAS LINEAS
@@ -89,7 +94,7 @@ public class descomponer {
     texto=texto.replace("kr ", "cr ");
     texto=texto.replace("nâ°", "#");texto=texto.replace("n0", "#");
     texto=texto.replace("manzana ", "mz ");texto=texto.replace("manz ", "mz ");texto=texto.replace("manza ", "mz ");
-    texto=texto.replace("manzana", "mz ");texto=texto.replace("manzan ", "mz ");
+    texto=texto.replace("manzana", "mz ");texto=texto.replace("manzan ", "mz ");texto=texto.replace("mza ", "mz ");texto=texto.replace("mzn ", "mz ");
     texto=texto.replace("numero", " ");texto=texto.replace("/", " ");
     texto=texto.replace("kilometro", " km ");
     texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
@@ -164,7 +169,7 @@ public class descomponer {
  public String textdelet (String texto){//eliminar textos inecesarios como No,etc K,etc 
        String result="";int control = -1;
        if((texto.contains(".cl.")==false)&&(texto.contains(".cr.")==false)){control=0;};
-       result = texto.replace(".No.", ".");
+       texto = texto.replace(".No.", "."); 
        //if ((texto.contains("av."))&&(control==0)){sintaxis="av?";}//si no contiene la expresion completa avenida mas calle o carrera asume estandar de avenida calle
       String segmentos[] = texto.split("\\.");
       //CORREGIMOS Y ELIMINAMOS AL PRINCIPIO DE LA NOMENCLATURA
@@ -180,15 +185,26 @@ public class descomponer {
       if("".equals(result)){result=texto;}//si no encuentra correccion devuelve el texto completo
        return result;
                                         }
- public String sintax (String txt){ //POSICION.LARGO.CASO.SUBCADENA///////////////
-    int contnumeros=0;String acumulador=".",acumulador2=".",cola=".",cola2=".";String sub="";// es necesario que previamente se tome el texto hasta el final del 3 numero
+ public String sintax (String txt) { //POSICION.LARGO.CASO.SUBCADENA///////////////
+    int contnumeros=0;String acumulador=".",acumulador2=".",garbagetxt="",cola=".",cola2=".";String sub="";// es necesario que previamente se tome el texto hasta el final del 3 numero
     StringTokenizer token = new StringTokenizer(txt,".");
               while (token.hasMoreTokens()){
                   sub = (token.nextToken());
+                  if ((isnumeric(sub)==false)&&(isletra(sub)==false)){garbagetxt=garbagetxt+sub+".";}//COLECTOR DE TEXTO BASURA
                   if (contnumeros<2){acumulador2=acumulador2+"."+sub;}else{cola2=cola2+"."+sub;}
                   if (contnumeros<3){acumulador=acumulador+"."+sub;}else{cola=cola+"."+sub;}
-                  if (isnumeric(sub)==true){contnumeros++;}    
+                  if (isnumeric(sub)==true){contnumeros++;} 
+                  
               }
+      //exportar_TextBasura(        
+   if(garbagetxt.length()>=1){
+       txt=GarbagDelet(garbagetxt,txt);acumulador=GarbagDelet(garbagetxt,acumulador);
+       acumulador2=GarbagDelet(garbagetxt,acumulador2);//String s = new String(garbagetxt.getBytes("ISO-8859-1"), "UTF-8");
+       garbagColect=garbagColect+garbagetxt+"\n";
+        //ELIMINA  TEXTO BASURA System.out.println(textIni+"-"+garbagetxt);     
+}
+   
+   
    if(contnumeros==2){acumulador=acumulador2;}else{}           
    cadena3num= acumulador.replace("..", ".");//aqui guarda en memoria la cadena hasta el tercer numero
    /////////////////////////////////////FIN DEL CONTROL PREVIO ARROJA SUBCADENA HASTA EL 3 NUMERO           
@@ -705,6 +721,55 @@ public String codigo (){
       
   }
  //<editor-fold defaultstate="collapsed" desc="Generated Code Funciones y Utilidades"> 
+    private String GarbagDelet(String txt,String textOrig){
+        String result=textOrig;//String abc="abcdefghijklmnñopqrstuvwxyz",numeros="0123456789";
+    ////////////PRIMERO DETERMINAMOS CUANTOS TEXTOS BASURA ENCONTRO EN LA CADENA Y LOS RECORREMOS    
+    try {
+       String segmentos[] = txt.split("\\."); int casos=segmentos.length;
+    if(casos==1){
+        if(segmentos[0].length()==1){  
+          result=result.replaceAll(segmentos[0], "");
+         }else{   
+            result=result.replaceAll("[–,;:·}{]", "");
+            for (int index = 0; index < segmentos[0].length(); index++) {
+             String check = String.valueOf(segmentos[0].charAt(index));
+             if ((isletra(check)==false)&&(isnumeric(check)==false)){
+                 result=result.replaceAll(check, "");//JOptionPane.showMessageDialog(null,check);
+                }
+            
+            }//fin for
+        
+        }//fin else
+    }//fin if   
+  ///////////////////////////PARA MAS DE UN CASO DE TEXTO BASURA  
+  if(casos>1){
+      for(String date: segmentos){
+        if(date.length()==1){  
+            result=result.replaceAll(date, "");
+         }else{
+               result=result.replaceAll("[–,;:·}{]", "");
+               for (int index = 0; index < date.length(); index++) {
+               String check = String.valueOf(date.charAt(index));
+                if ((isletra(check)==false)&&(isnumeric(check)==false)){
+                   result=result.replaceAll(check, "");//JOptionPane.showMessageDialog(null,check);
+                   }
+            
+            }//fin for 
+        }//fin else
+      } //fin for de segmentos
+  }//fin if         
+          
+    } catch(Exception e){
+       
+            try {
+                exportar_TextBasura(textOrig+"-"+txt);return textOrig; //JOptionPane.showMessageDialog(null,"error procesando texto");
+            } catch (IOException ex) {
+                Logger.getLogger(descomponer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }  
+        return result;
+        
+ }  
     private String arrayTostring(String array[]){
        String result="",acum="";
        for(String sub:array) {
@@ -856,7 +921,40 @@ public String codigo (){
       acumulador= acumulador.replace("..", ".");       
        return acumulador;       
     }
- // </editor-fold>       
+ // </editor-fold>   
+static void exportar_TextBasura(String valor) throws IOException {
+
+     try{
+         String strPath = System.getProperty("user.home");
+        String f = strPath+"\\Documents\\TextBasura.txt";
+        File file = new File(f); 
+     //Writer escribe = null;//FileOutputStream fis = new FileOutputStream(f);
+     PrintWriter writer = new PrintWriter(f, "UTF-8");
+    if (!file.exists()) {
+                file.createNewFile();
+            }
+   // escribe = new BufferedWriter(new OutputStreamWriter(
+     //               new FileOutputStream(file), "UTF8"));
+      //      escribe.write(valor);
+
+    //FileWriter  dos=new FileWriter(f,true);//FileWriter  dos=new FileWriter(f,true);
+    writer.println(valor);
+    writer.println("\n");
+   // escribe.write((valor==null)?"null":valor);
+    //escribe.write("\n");
+
+    //i=i+1;
+    //}
+    //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
+    writer.close();System.gc();
+    }
+    catch(FileNotFoundException e){
+    System.out.println("No se encontro el archivo");
+    }
+    catch(IOException e){
+    JOptionPane.showMessageDialog(null, "error");
+    }
+ }    
 }
 ///////////////FUNCIONES CON MANEJO DE FICHEROS EXPORTACION E IMPORTACION
 class ListaDirecciones{
@@ -1106,7 +1204,7 @@ public void procesarLista( ) throws IOException{
     //i=i+1;
     //}
     //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
-    dos.close();
+    dos.close();System.gc();
     }
     catch(FileNotFoundException e){
     System.out.println("No se encontro el archivo");

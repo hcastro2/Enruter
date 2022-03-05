@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -33,7 +32,7 @@ public class descomponer {
 // la idea es tomar el texto original y eliminar los posibles errores y particularidades del lenguaje comun    
     public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
     String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni,garbagColect="";
-    String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cardinal1,cardinal2;
+    String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cadena2num,cardinal1,cardinal2;
   
   public void inicomponentes() {
         this.finnumericos = "";
@@ -80,6 +79,7 @@ public class descomponer {
         texto = texto.trim();texto=texto.replace("N°","#");texto=texto.replace("¥","");texto=texto.replace("NË"," ");
         texto=texto.replace("N?"," ");texto=texto.replace(" NÉ "," ");texto=texto.replace(" N` "," ");texto=texto.replace(" N§ "," ");
         texto=texto.replace(" Nø "," ");texto=texto.replace(" ?Ñ "," ");texto=texto.replace(" NÂ° "," ");
+        texto=texto.replace(" S/N "," sn ");texto=texto.replace(" s/n "," sn ");
         texto=texto.replace("?","#");texto=texto.replace("æ"," ");texto=texto.replace("N§"," ");texto=texto.replace("\\"," ");
         texto = texto.replaceAll("[#-/_]", " ");//caracteres especiales que se reemplazan por espacio
         texto = texto.replaceAll("[–.,;:·]", " ");texto = texto.replaceAll("  ", " ");
@@ -100,10 +100,11 @@ public class descomponer {
     texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
     texto=texto.replace("manzana", "mz");texto=texto.replace("casa", "cs");
     texto=texto.replace("transversal", "tv ");texto=texto.replace("trr ", "tv ");texto=texto.replace("transv ", "tv ");
-    texto=texto.replace("trv ", "tv ");texto=texto.replace("trasv ", "tv ");texto=texto.replace("tras ", "tv ");
+    texto=texto.replace("trv ", "tv ");texto=texto.replace("trasv ", "tv ");texto=texto.replace("tras ", "tv ");texto=texto.replace("trasnv ", "tv ");
     texto=texto.replace("trasversal ", "tv ");texto=texto.replace("trans ", "tv ");texto=texto.replace("tr ", "tv ");
     texto=texto.replace("diagonal", "dg");texto=texto.replace("diag ", "dg");texto=texto.replace("dig ", "dg");
-    texto=texto.replaceFirst("calle", "cl ");texto=texto.replace("calle ", "cl ");texto=texto.replace("cll ", "cl ");
+    texto=texto.replaceFirst("callejon ", "cjn ");
+    texto=texto.replaceFirst("calle ", "cl ");texto=texto.replace("calle ", "cl ");texto=texto.replace("cll ", "cl ");
     texto=texto.replace("clle ", "cl ");texto=texto.replace("call ", "cl ");
     texto=texto.replace("nro ", " ");texto=texto.replace("NRO", " ");texto=texto.replace(" no ", " ");texto=texto.replace(" No ", " ");
     texto=texto.replace(" oe ", " oeste ");texto=texto.replace(" es ", " este ");
@@ -113,7 +114,7 @@ public class descomponer {
     texto=texto.replace("n#","#"); texto=texto.replace("#"," ");
      /////////////////////////////////////////////////////////////////////////////////////////////
                                                                                
-     if ((texto.isEmpty())||(" ".equals(texto))) {texto="null"; } 
+     if ((texto.isEmpty())||(" ".equals(texto))) {texto="null:"; } 
 //////////////////////////////////////////////////////////////////////////////////////////////////   
     
      return texto;   
@@ -205,7 +206,8 @@ public class descomponer {
 }
    
    
-   if(contnumeros==2){acumulador=acumulador2;}else{}           
+   if(contnumeros==2){acumulador=acumulador2;}else{}  
+   cadena2num=acumulador2.replace("..", ".")+".";
    cadena3num= acumulador.replace("..", ".");//aqui guarda en memoria la cadena hasta el tercer numero
    /////////////////////////////////////FIN DEL CONTROL PREVIO ARROJA SUBCADENA HASTA EL 3 NUMERO           
     String result;txt=acumulador+".";txt = txt.replace("..", ".");
@@ -217,7 +219,7 @@ public class descomponer {
              
                   if ((largo==2)&&(sub.contains("n"))&&(!"no".equals(sub))){caso=1;}//caso 1
                   if ((largo==2)&&(sub.contains("e"))){caso=2;}//caso 2 casos 3 y 4 reservados para Sur y oriente
-                  if ((largo==1)&&(sub.equals("t"))){caso=5;}
+                  if ((largo==1)&&(sub.equals("t"))){caso=5;}//caso transversales
                   if (caso==1){subcadena.add(caso+","+point+","+largo);}
                   if (caso==2){subcadena.add(caso+","+point+","+largo);}
                   if (caso==5){subcadena.add(caso+","+point+","+largo);}
@@ -258,8 +260,9 @@ public class descomponer {
                     Object  data2[]= sub.split(",");
                   inicio= Integer.parseInt((String) data2[1]);larg= Integer.parseInt((String) data2[2]);
                     original="."+txt.substring(inicio,inicio+1)+".";
-                  reemplazo=".tv.";
-                    txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
+                    reemplazo=".tv.";
+                    if((!"".equals(cadena2num))&&(cadena2num.contains(".t."))){//REEMPLAZAR T POR TV SI SE ENCUENTRA ANTES DEL SEGUNDO NUMERO
+                    txt = txt.replace(original,reemplazo);} //JOptionPane.showMessageDialog(null,txt);
                     data1=null;
                     break;
                 default:  
@@ -330,9 +333,13 @@ public void expresion (String exp){ //String expresion (String exp){
      }
     catch(Exception e){
         sintaxis="null";//JOptionPane.showMessageDialog(null, "error");
-        String subviales[] = vectorabc.split(","); if(subviales.length>3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
+        String subviales[] = vectorabc.split(","); 
+        if(subviales.length>3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
+        //cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
         String exp2="."+exp;
       if ((exp2.contains(".mz."))&&(exp2.contains(".cs."))){sintaxis="mz";}
+      if ((exp2.contains(".km."))||(exp2.contains("km."))){sintaxis="null";}
+      //if (cardinal1==null){sintaxis="null";}
     }  
 }   
 public String divExpresion (String s){
@@ -471,6 +478,7 @@ public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=
                                  array[3]= q + subc;//JOptionPane.showMessageDialog(null, "6");// array[6]
                                }else{
                                  array[6]= x + subc;// JOptionPane.showMessageDialog(null, "3");// array[3]
+                                    
                          }
              }
         
@@ -487,8 +495,12 @@ public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=
    if (numeric1.equals(numeric2)){control = st.lastIndexOf("."+numeric2+".");}else{control = st.indexOf("."+numeric2+".");} 
           
     switch(contLetra1digito){
-        case 0:
-            array[3]=0;array[6]=0;
+        case 0://tener en cuenta aqui caso con bis ya que no debe borrar ese valor||(array[6]!=""))
+           // array[3]=0;array[6]=0;
+               if((array[3]==null)&&(array[6]==null)){ array[3]=0;array[6]=0;  }else{
+                   array[3]=(array[3]==null)?0:array[3];
+                   array[6]=(array[6]==null)?0:array[6];
+                }    
           break; 
         case 1:
             if(array[7].equals(1)){
@@ -565,7 +577,7 @@ private void subVia(String s){
     } 
 }
 public String especialcase (String e){
-    int s = -1;
+    int s = -1;String baseabc = "#abcdefghijklmnopqrstuvwxyz";
     if(("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=0;}
     if(("ltr".equals(sintaxis))&&(contltr>=1)&&(
             contnum==0)){s=1;}
@@ -574,18 +586,19 @@ public String especialcase (String e){
     if((e.contains("km."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=0)){s=4;}//casos con kilometro
     if (("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==2)){s=5;}//caso 
     if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
-    if (("vialExtra".equals(sintaxis))){s=7;}//casos con mas de 2 letras para determinar subvia
+    if (("vialExtra".equals(sintaxis))&&(cardinal1!=null)){s=7;}//casos con mas de 2 letras para determinar subvia
     if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
         if((ee.contains(".mz."))&&(ee.contains(".cs."))){s=8;}  ;}
     ////////////espacio para otros casos
-    if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=9;}//dejar este como ultimo caso con cero numeros y todas
-    if (("null".equals(sintaxis))&&(contnum==1)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas 
+    if (("null".equals(sintaxis))&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
+    if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas
       switch(s){
           case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
           array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
               break;
-          case 1:e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
-          array[0]=200; if (e.contains(".cl.")==true){array[2]=0;} if (e.contains(".dg.")==true){array[2]=1;}
+          case 1:
+              e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
+          array[0]=102; if (e.contains(".cl.")==true){array[2]=0;} if (e.contains(".dg.")==true){array[2]=1;}
           if (e.contains(".cr.")==true){array[5]=2;} if (e.contains(".tv.")==true){array[5]=3;} 
               break;
           case 2://casos de avenidas
@@ -593,8 +606,7 @@ public String especialcase (String e){
                  e= buscarList(e)+ e;
                  coordenada(e);
                  cardinal(e);
-                 subcardinal(e);
-                 subVia(e);
+                 subVia(e);subcardinal(e);
               codigo();
                }else{
                      array[2]=numeric1;array[5]=numeric2;array[7]=1;
@@ -605,54 +617,58 @@ public String especialcase (String e){
               break; 
           case 3:
                if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
-                 e= buscarList(e)+ e;//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
-                  coordenada(e);cardinal(e);subcardinal(e);subVia(e);
+                 e= buscarList(e)+ e;inicomponentes();//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
+                 e = alfanumeric(e);e = sintax(e); expresion(e);
+                  coordenada(e);cardinal(e);subVia(e);subcardinal(e);
               codigo();
                 }else{
                      String segment[] = textIni.split(" ");
-                   e="ErrXY: "+arrayTostring(segment);
+                     e="ErrXY: "+arrayTostring(segment);array[0]=503;
               
-                   }
+                }
               break;
           case 4://AQUI COTEJAMOS LOS CASOS QUE LLEVAN EL INDICADOR KM KILOMETRO CODIGO 400
              array[0]=400;array[2]=numeric1;array[3]=numeric2;array[4]=numeric3;array[8]=0; //JOptionPane.showMessageDialog(null, "si");
               break;
           case 5://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
-             cardinal(e);array[0]=500;
+             cardinal(e);array[0]=105;
               break; 
-          case 6://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
+          case 6://AQUI COTEJAMOS LOS CASOS CON NOMENCLATURA INVERTIDA
              String nuevoText=invertir(e);inicomponentes();
              texting(nuevoText);
               break; 
-          case 7:
+          case 7://CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR 700
               int pointA=-1,pointB=-1,pointC=-1,pointD=-1,pointN1=-1,pointN2=-1;
               String cadena=vectorabc.substring(1, vectorabc.length());
               String subviales[] = cadena.split(",");
               String segmentos[] = e.split("\\.");
-       if(subviales.length==3) {
-           pointA = Arrays.asList(segmentos).indexOf(subviales[0]);
-           pointB = Arrays.asList(segmentos).indexOf(subviales[1]);
-           pointC = Arrays.asList(segmentos).indexOf(subviales[2]);
-           pointN1=Arrays.asList(segmentos).indexOf(numeric1);
-           pointN2=Arrays.asList(segmentos).indexOf(numeric2);
-       }           
-        ///////RESOLVER POR CASOS/////////////////////////////////////////////////
-     if ((pointA-pointB==-1)&&("e".equals(subviales[1]))){segmentos[pointB]="este";//si caso "e" ubicado despues de pointA representa eñ "este"   
-     e=arrayTostring(segmentos);inicomponentes();
-         e = alfanumeric(e);e = sintax(e); expresion(e); coordenada(e);cardinal(e);subcardinal(e);subVia(e);codigo(); 
-     }
+               if(subviales.length==3) {
+                   pointA = Arrays.asList(segmentos).indexOf(subviales[0]);
+                   pointB = Arrays.asList(segmentos).indexOf(subviales[1]);
+                   pointC = Arrays.asList(segmentos).indexOf(subviales[2]);
+                   pointN1=Arrays.asList(segmentos).indexOf(numeric1);
+                   pointN2=Arrays.asList(segmentos).indexOf(numeric2);
+               }           
+                ///////RESOLVER POR CASOS/////////////////////////////////////////////////
+             if ((pointA-pointB==-1)&&("e".equals(subviales[1]))){segmentos[pointB]="este";//si caso "e" ubicado despues de pointA representa eñ "este"   
+             e=arrayTostring(segmentos);inicomponentes();
+                 e = alfanumeric(e);e = sintax(e); expresion(e); coordenada(e);cardinal(e);subVia(e);subcardinal(e);codigo(); 
+             }else{
+                    String segment[] = textIni.split(" ");
+                   e="Errabc: "+arrayTostring(segment);array[0]=507;
+             }
                            
               break;
-          case 8: //CASO DE MANZANAS 
+          case 8: //CASO DE MANZANAS ERROR 800
             int pointMz=-1,pointCs=-1;String numMz,numCs;  
-              String segmentos2[] = e.split("\\."); String baseabc = "#abcdefghijklmnopqrstuvwxyz";
+              String segmentos2[] = e.split("\\."); //String baseabc = "#abcdefghijklmnopqrstuvwxyz";
               //////////////PRIMERO BUSCAMOS NUMERO DE CASA////////////////////////////
               pointMz = Arrays.asList(segmentos2).indexOf("mz");
               if((segmentos2[pointMz].length()==2)&&("mz".equals(segmentos2[pointMz]))&&(pointMz+1<segmentos2.length)){
                    numMz= (pointMz==-1)?"":segmentos2[pointMz+1];
-                   if(isnumeric(numMz)==true){array[7]=numMz;}else{array[7]=baseabc.indexOf(numMz); }
-                    if( "-1".equals(array[7].toString())){array[7]=0;}
-              }else{array[7]=0;}
+                   if(isnumeric(numMz)==true){array[5]=numMz;}else{array[5]=baseabc.indexOf(numMz); }
+                    if( "-1".equals(array[5].toString())){array[5]=0;}
+              }else{array[5]=0;}
               //////////////SEGUNDO NUMERO DE CASA//////////////////////////////////////
               pointCs= Arrays.asList(segmentos2).indexOf("cs");
              if((segmentos2[pointCs].length()==2)&&("cs".equals(segmentos2[pointCs]))&&(pointCs+1<segmentos2.length)){
@@ -660,18 +676,21 @@ public String especialcase (String e){
                 if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]="0"; }
                 
               }else{array[8]="0";}
-             
-             if((segmentos2[pointMz].length()>2)&& (segmentos2[pointCs].length()>2)){
-             e="ErrMz: "+arrayTostring(segmentos2);}
+             int matchMz = Integer.parseInt(array[5].toString()) , matchCs=Integer.parseInt(array[8].toString());  
+             if((matchMz<1)||(matchCs<1)){
+              e="ErrMz: "+arrayTostring(segmentos2);array[0]=508;}
               
               
               break;
-          case 9:
-              String segment[] = textIni.split(" ");
-              e="Rural: "+arrayTostring(segment);
+          case 9://IDEA:ORGANIZAR EN ORDEN ALFABETICO
+              String letra1= e.substring(0,1);int posicion=0;
+              if (isletra(letra1)==true){posicion=baseabc.indexOf(letra1);}
+              e=e;array[7]=contnum;array[8]=posicion;//numeric1;
+              
               break;
           case 10:
-              e=e;array[8]=numeric1;
+              String segment[] = textIni.split(" ");
+              e="Rural: "+arrayTostring(segment);array[0]=510;
               break;    
           default:
             

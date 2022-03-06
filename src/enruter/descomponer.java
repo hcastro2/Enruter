@@ -69,7 +69,7 @@ public class descomponer {
                   
                 result=especialcase(result);  
               }
-              if (array[9]==null){}else{result = result+array[9];}//VUELVE A COMPLETAR LA CADENA QUE SE HABIA DIVIDIDO PARA MAYOR CONTROL
+              if ((array[9]==null)||("0".equals(String.valueOf(array[9])))){}else{result = result+array[9];}//VUELVE A COMPLETAR LA CADENA QUE SE HABIA DIVIDIDO PARA MAYOR CONTROL
             return result;
     }
 //////////////////////////PREFORMATEAR LA EXPRESION//////////////////////////////////////  
@@ -89,7 +89,7 @@ public class descomponer {
         //////////////ESTANDARIZAR EXPRESIONES
     texto=texto.replace("ª","#");texto=texto.replace("º","#");texto=texto.replace("°","#");texto=texto.replace("*","");
     texto=texto.replace("½"," ");texto=texto.replace("ï"," ");texto=texto.replace("¿"," ");
-    texto=texto.replace("ak ","cr av");texto=texto.replace("ac ", "cl av");texto=texto.replace("1ra", "1");texto=texto.replace("3ra", "3");
+    texto=texto.replace("ak ","cr av");texto=texto.replace("ac ", "cl av");texto=texto.replace("1ra", "1");texto=texto.replace("3ra", "3 ");
     texto=texto.replace("carrera","cr");texto=texto.replace("karrera", "cr ");texto=texto.replace("cra ", "cr ");texto=texto.replace("kra", "cr ");
     texto=texto.replace("kr ", "cr ");
     texto=texto.replace("nâ°", "#");texto=texto.replace("n0", "#");
@@ -98,11 +98,11 @@ public class descomponer {
     texto=texto.replace("numero", " ");texto=texto.replace("/", " ");
     texto=texto.replace("kilometro", " km ");
     texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
-    texto=texto.replace("manzana", "mz");texto=texto.replace("casa", "cs");
+    texto=texto.replace("manzana", "mz ");texto=texto.replace("casa", "cs ");
     texto=texto.replace("transversal", "tv ");texto=texto.replace("trr ", "tv ");texto=texto.replace("transv ", "tv ");
     texto=texto.replace("trv ", "tv ");texto=texto.replace("trasv ", "tv ");texto=texto.replace("tras ", "tv ");texto=texto.replace("trasnv ", "tv ");
-    texto=texto.replace("trasversal ", "tv ");texto=texto.replace("trans ", "tv ");texto=texto.replace("tr ", "tv ");
-    texto=texto.replace("diagonal", "dg");texto=texto.replace("diag ", "dg");texto=texto.replace("dig ", "dg");
+    texto=texto.replace("trasversal", "tv ");texto=texto.replace("trans ", "tv ");texto=texto.replace("tr ", "tv ");
+    texto=texto.replace("diagonal", "dg ");texto=texto.replace("diag ", "dg ");texto=texto.replace("dig ", "dg ");
     texto=texto.replaceFirst("callejon ", "cjn ");
     texto=texto.replaceFirst("calle ", "cl ");texto=texto.replace("calle ", "cl ");texto=texto.replace("cll ", "cl ");
     texto=texto.replace("clle ", "cl ");texto=texto.replace("call ", "cl ");
@@ -170,15 +170,19 @@ public class descomponer {
  public String textdelet (String texto){//eliminar textos inecesarios como No,etc K,etc 
        String result="";int control = -1;
        if((texto.contains(".cl.")==false)&&(texto.contains(".cr.")==false)){control=0;};
-       texto = texto.replace(".No.", "."); 
+       texto = texto.replace(".No.", "."); texto = texto.replace(".nr.", ".");texto = texto.replace(".ni.", ".");
        //if ((texto.contains("av."))&&(control==0)){sintaxis="av?";}//si no contiene la expresion completa avenida mas calle o carrera asume estandar de avenida calle
       String segmentos[] = texto.split("\\.");
       //CORREGIMOS Y ELIMINAMOS AL PRINCIPIO DE LA NOMENCLATURA
       if (segmentos[0].length()==1){result=corregirText(texto,segmentos);}//caso c=calle k=carrera
-      if (segmentos[0].contains("avn")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("avn")){result=corregirText(texto,segmentos);}//subfuncion corregirtext encapsuladas en funciones y utiliddes
       if (segmentos[0].contains("crr")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("car")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("cra")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("kr")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("cll")){result=corregirText(texto,segmentos);}
+       if (segmentos[0].contains("calle")){result=corregirText(texto,segmentos);}
+      if (segmentos[0].contains("diag")){result=corregirText(texto,segmentos);}
       if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))){result=corregirText(texto,segmentos);}
      //JOptionPane.showMessageDialog(null,buscarH("ca", segmentos));
       if((buscarH("ca", segmentos)>-1)&&(texto.contains("mz"))){
@@ -244,7 +248,7 @@ public class descomponer {
                   Object  data[]= sub.split(",");
                   inicio= Integer.parseInt((String) data[1]);larg= Integer.parseInt((String) data[2]);
                   original="."+txt.substring(inicio,inicio+2)+".";
-                  reemplazo="."+txt.substring(inicio,inicio+1)+".norte.";
+                   reemplazo=   original.replace("n", ".norte.");//reemplazo="."+txt.substring(inicio,inicio+1)+".norte.";
                   txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
                      data=null;
                  break;
@@ -252,7 +256,7 @@ public class descomponer {
                     Object  data1[]= sub.split(",");
                   inicio= Integer.parseInt((String) data1[1]);larg= Integer.parseInt((String) data1[2]);
                   original="."+txt.substring(inicio,inicio+2)+".";
-                  reemplazo="."+txt.substring(inicio+1,inicio+2)+".este.";
+                  reemplazo=   original.replace("e", ".este.");
                   txt = txt.replace(original,reemplazo); //JOptionPane.showMessageDialog(null,txt);
                   data1=null;
                    break;
@@ -312,9 +316,10 @@ public void expresion (String exp){ //String expresion (String exp){
               if (isnumeric(sub)==true){contnum++;finnumericos=sub;}
               if ((isnumeric(sub)==true)&&(contnum==3)){numeric3=sub;}
               if (isletra(sub)==true){contltr++;}if (buscar(sub,base)==true){control="ltr";}
-              if ((isletra(sub)==true)&&(sub.length()==1)){vectorabc=vectorabc+","+sub;}//CASO CON MAS DE 2 LETRAS PARA DEFINIR SUBVIA
-              if ((contnum>0)&&(contnum<3)&&(isletra(sub)==true)&&(sub.length()==1)&&(!"n".equals(sub))){letraabc[contLetra1digito]=sub;contLetra1digito++;}
-         
+             // if ((isletra(sub)==true)&&(sub.length()==1)){vectorabc=vectorabc+sub+",";}//CASO CON MAS DE 2 LETRAS PARA DEFINIR SUBVIA
+              if((contnum<3)){
+              if ((contnum>0)&&(isletra(sub)==true)&&(sub.length()==1)&&(!"n".equals(sub))){vectorabc=vectorabc+sub+",";letraabc[contLetra1digito]=sub;contLetra1digito++;}
+              }
           //contnum cuenta cada subcadena con datos numericos
           if (contnum<2){cadenaq1=cadenaq1+"."+sub;}
           if ((contnum>=2)&&(contnum<3)){cadenaq2=cadenaq2+"."+sub;}       
@@ -334,7 +339,7 @@ public void expresion (String exp){ //String expresion (String exp){
     catch(Exception e){
         sintaxis="null";//JOptionPane.showMessageDialog(null, "error");
         String subviales[] = vectorabc.split(","); 
-        if(subviales.length>3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
+        if(subviales.length>=3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
         //cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
         String exp2="."+exp;
       if ((exp2.contains(".mz."))&&(exp2.contains(".cs."))){sintaxis="mz";}
@@ -590,7 +595,7 @@ public String especialcase (String e){
     if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
         if((ee.contains(".mz."))&&(ee.contains(".cs."))){s=8;}  ;}
     ////////////espacio para otros casos
-    if (("null".equals(sintaxis))&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
+    if (("null".equals(sintaxis))&&(contltr>0)&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
     if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas
       switch(s){
           case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
@@ -638,21 +643,18 @@ public String especialcase (String e){
              texting(nuevoText);
               break; 
           case 7://CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR 700
-              int pointA=-1,pointB=-1,pointC=-1,pointD=-1,pointN1=-1,pointN2=-1;
-              String cadena=vectorabc.substring(1, vectorabc.length());
-              String subviales[] = cadena.split(",");
-              String segmentos[] = e.split("\\.");
-               if(subviales.length==3) {
-                   pointA = Arrays.asList(segmentos).indexOf(subviales[0]);
-                   pointB = Arrays.asList(segmentos).indexOf(subviales[1]);
-                   pointC = Arrays.asList(segmentos).indexOf(subviales[2]);
-                   pointN1=Arrays.asList(segmentos).indexOf(numeric1);
-                   pointN2=Arrays.asList(segmentos).indexOf(numeric2);
-               }           
-                ///////RESOLVER POR CASOS/////////////////////////////////////////////////
-             if ((pointA-pointB==-1)&&("e".equals(subviales[1]))){segmentos[pointB]="este";//si caso "e" ubicado despues de pointA representa eñ "este"   
-             e=arrayTostring(segmentos);inicomponentes();
-                 e = alfanumeric(e);e = sintax(e); expresion(e); coordenada(e);cardinal(e);subVia(e);subcardinal(e);codigo(); 
+            
+            String newE =  corregir3abc(e);//
+                
+              if((!newE.equals(e))){
+               inicomponentes();
+               newE = sintax(newE); 
+               expresion(newE); 
+               coordenada(newE);
+               cardinal(newE);
+               subVia(newE);
+               subcardinal(newE);
+               codigo(); e=e;
              }else{
                     String segment[] = textIni.split(" ");
                    e="Errabc: "+arrayTostring(segment);array[0]=507;
@@ -690,7 +692,11 @@ public String especialcase (String e){
               break;
           case 10:
               String segment[] = textIni.split(" ");
+              if("null:".equals(segment[0])){
+                 e="Error:"+e; 
+              }else{
               e="Rural: "+arrayTostring(segment);array[0]=510;
+              }
               break;    
           default:
             
@@ -740,6 +746,84 @@ public String codigo (){
       
   }
  //<editor-fold defaultstate="collapsed" desc="Generated Code Funciones y Utilidades"> 
+    private String corregir3abc(String txt){//CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR
+        //String cadena1=vectorabc.substring(1, vectorabc.length());
+       String caso="",result = "";String subviales1[] = vectorabc.split(",");String numericq="";
+       if(contnum==1){numericq=numeric1;}else{if(contnum==2){numericq=numeric2;}}
+        if(vectorabc.contains("e")){caso="e";} 
+        if(vectorabc.contains("d")){caso="d";}
+        if(vectorabc.contains("t")){caso="t";}
+       // if(txt.indexOf(numericq)<txt.indexOf(subviales1[0])){caso="out";}//no determina bien el ultimo numero en sintaxis
+       // if(cardinal1==""){abc3="cardnull";}//pendiente
+         switch(caso){
+                     
+                     case "e":
+                        txt=txt.replace(".e.", ".este.");result= txt; 
+                         break;
+                     case "d":
+                        //txt=txt.replace(".e.", ".este.");result= txt; 
+                         break;   
+                     case "t":
+                        //txt=txt.replace(".e.", ".este.");result= txt; 
+                         break;    
+                     case "out":
+                        for(String abc:subviales1){ 
+                        txt=txt.replace("."+abc+".", ".");
+                            }
+                        result= txt; 
+                         break;
+                         
+                     case ""://por default simplemente determinar posicion si es correcta se tomara la letra sino se ignorara
+                         int pointA=-1,pointB=-1,pointC=-1,pointD=-1,pointN1=-1,pointN2=-1;
+                         String abc1 = null,abc2,abc3 = "",textabc=vectorabc;boolean matchA=false,matchB=false;
+                              //String cadena=vectorabc.substring(1, vectorabc.length());
+                              String subviales[] = vectorabc.split(",");
+                              String segmentos[] = txt.split("\\.");
+                             if(subviales.length==3) {
+                                //primero determinar primer numero y al lado su letraabc 
+                                pointN1=Arrays.asList(segmentos).indexOf(numeric1);
+                                //determinar la letra que le corresponde y este dentro del largo de la cadena
+                                if (pointN1+1<segmentos.length){ abc1=segmentos[pointN1+1];}else{abc1="null";}
+                                //si esta dentro de la cadena y esta entre las letras abc entonces es match correcto y la elimina de la lista                               
+                                if(vectorabc.contains(abc1)){textabc=vectorabc.replaceFirst(abc1+",", "");matchA=true;}else{matchA=false;}
+                                //segundo determinar segundo numero y al lado su letraabc
+                                pointN2=Arrays.asList(segmentos).indexOf(numeric2);
+                                //determinar la letra que le corresponde y este dentro del largo de la cadena
+                                if (pointN2+1<segmentos.length){ abc2=segmentos[pointN2+1];}else{abc2="null";}
+                                //si esta dentro de la cadena y esta entre las letras abc entonces es match correcto y la elimina de la lista                               
+                                if(vectorabc.contains(abc2)){textabc=textabc.replaceFirst(abc2+",", "");matchB=true;}else{matchB=false;}
+                                
+                             if ((matchA==true)&&(matchB==true)) {
+                                 abc3=textabc.replace(",", "");
+                                 //aqui //la tercera letra sobrante es el caso a resolver ignorandolo o interpretando su valor
+                                int cont=0;//pointC=Arrays.asList(segmentos).indexOf(abc3);
+                                     for(String seg: segmentos){
+                                         if ((seg.equals(abc3))&&(cont!=pointN1+1)&&(cont!=pointN2+1))//
+                                         {segmentos[cont]="." ; }//JOptionPane.showMessageDialog(null,cont)
+                                         cont++;
+                                     }
+                                result=arrayTostring(segmentos);
+                              }else{  
+                              //si no hay match en los dos casos   se determina casos para ignorar las letras
+                              
+                              //opcion final eliminar las tres letras
+                                       for(String sub: subviales){
+                                         result= txt.replace("."+sub+".", ".");txt=result;
+                                       } 
+                                }//fin else 
+                               }//fin if(subviales.length==3) {
+                           
+                         break;
+
+                     default:
+                         break;
+                 }
+                 
+        if("".equals(result)){result=txt;}  //si despues de procesar no encuentra caso retorna la cadena original    
+                 
+        return result;
+        
+    }
     private String GarbagDelet(String txt,String textOrig){
         String result=textOrig;//String abc="abcdefghijklmnñopqrstuvwxyz",numeros="0123456789";
     ////////////PRIMERO DETERMINAMOS CUANTOS TEXTOS BASURA ENCONTRO EN LA CADENA Y LOS RECORREMOS    
@@ -794,7 +878,7 @@ public String codigo (){
        for(String sub:array) {
            acum=acum+"."+sub;
        }
-        result= acum.substring(1, acum.length())+".";
+        result= acum.substring(1, acum.length())+".";result=result.replace("..", ".");
         return result;
     }
     private String llenarceros(String text,int numCeros){
@@ -832,11 +916,23 @@ public String codigo (){
            case "car":
             result=  exp.replaceFirst("car.", "cr.");   
                break; 
+           case "cra":
+            result=  exp.replaceFirst("cra.", "cr.");   
+               break;    
            case "carr":
             result=  exp.replaceFirst("carr.", "cr.");
-               break;     
+               break;
+           case "kr":
+            result=  exp.replaceFirst("kr.", "cr.");
+               break;    
             case "cll":
             result=  exp.replaceFirst("cll.", "cl.");
+               break;
+           case "calle":
+            result=  exp.replaceFirst("calle.", "cl.");
+               break;    
+            case "diag":
+            result=  exp.replaceFirst("diag", "dg.");
                break;
            default:
                break;

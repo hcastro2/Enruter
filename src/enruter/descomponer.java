@@ -1,30 +1,24 @@
 package enruter;
 
+import com.sun.tools.javac.util.StringUtils;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import java.text.Normalizer;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 
 
@@ -52,7 +46,8 @@ public class descomponer {
               sub = (token.nextToken());cont++;
               result = result+"."+sub;
                                            }
-              result = result.substring(1, result.length()) ;  
+              result = result.substring(1, result.length()) ;
+              //JOptionPane.showMessageDialog(null, result);
               result = alfanumeric(result);//descomponer alfanumericos
               result = textdelet(result);//eliminando texto inicesario
               result = sintax(result);//Corregir problemas de sintaxis
@@ -76,10 +71,11 @@ public class descomponer {
     public String preformatear(String texto){
   
         if ("".equals(texto)){texto="Null";}
-        texto = texto.trim();texto=texto.replace("N°","#");texto=texto.replace("¥","");texto=texto.replace("NË"," ");
+        texto = texto.trim();texto=texto.replace("N#","");texto=texto.replace("¥","");texto=texto.replace("NË"," ");
         texto=texto.replace("N?"," ");texto=texto.replace(" NÉ "," ");texto=texto.replace(" N` "," ");texto=texto.replace(" N§ "," ");
         texto=texto.replace(" Nø "," ");texto=texto.replace(" ?Ñ "," ");texto=texto.replace(" NÂ° "," ");
-        texto=texto.replace(" S/N "," sn ");texto=texto.replace(" s/n "," sn ");
+        texto=texto.replace(" S/N "," sn ");texto=texto.replace(" s/n "," sn ");texto=texto.replace("N°","");
+        texto=texto.replace("N�","");texto=texto.replace("�","");
         texto=texto.replace("?","#");texto=texto.replace("æ"," ");texto=texto.replace("N§"," ");texto=texto.replace("\\"," ");
         texto = texto.replaceAll("[#-/_]", " ");//caracteres especiales que se reemplazan por espacio
         texto = texto.replaceAll("[–.,;:·]", " ");texto = texto.replaceAll("  ", " ");
@@ -95,11 +91,12 @@ public class descomponer {
     texto=texto.replace("nâ°", "#");texto=texto.replace("n0", "#");
     texto=texto.replace("manzana ", "mz ");texto=texto.replace("manz ", "mz ");texto=texto.replace("manza ", "mz ");
     texto=texto.replace("manzana", "mz ");texto=texto.replace("manzan ", "mz ");texto=texto.replace("mza ", "mz ");texto=texto.replace("mzn ", "mz ");
+    texto=texto.replace("lote ", "lt ");
     texto=texto.replace("numero", " ");texto=texto.replace("/", " ");
     texto=texto.replace("kilometro", " km ");
     texto=texto.replace(" Nª ","#");texto=texto.replace(" Nº ","");
-    texto=texto.replace("manzana", "mz ");texto=texto.replace("casa", "cs ");
-    texto=texto.replace("transversal", "tv ");texto=texto.replace("trr ", "tv ");texto=texto.replace("transv ", "tv ");
+    texto=texto.replace(" casa ", " cs ");
+    texto=texto.replace("transversal ", "tv ");texto=texto.replace("trr ", "tv ");texto=texto.replace("transv ", "tv ");
     texto=texto.replace("trv ", "tv ");texto=texto.replace("trasv ", "tv ");texto=texto.replace("tras ", "tv ");texto=texto.replace("trasnv ", "tv ");
     texto=texto.replace("trasversal", "tv ");texto=texto.replace("trans ", "tv ");texto=texto.replace("tr ", "tv ");
     texto=texto.replace("diagonal", "dg ");texto=texto.replace("diag ", "dg ");texto=texto.replace("dig ", "dg ");
@@ -142,29 +139,40 @@ public class descomponer {
        return result;
                                         } 
     public String separar (String alfanum){
-     String result="",a,l="",n="",t="",sub;int largo = alfanum.length(); //char a,b = 0;
+     String result="",a,l="",n="",t="",sub,acum="";int largo = alfanum.length(); //char a,b = 0;
      
-        for (int i =0; i < largo;i++){
+    /*    for (int i =0; i < largo;i++){
             a = alfanum.substring(i, i+1);
             
              if ((isletra(a)==true)){
-               l= l+a;n=n+"."; 
-                                    }
+               l= l+a;n=n+"."; }
              if ((isnumeric(a)==true)){
-               n=n+a;l=l+"."; 
-                                      }
-              t=n+"."+l;
-        }   
-        ////////////////
-       StringTokenizer token = new StringTokenizer(t,".");
+               n=n+a;l=l+"."; }                       
+              t=n+"."+l;          //t=n+"."+l;  oroginal
+        }   */
+/////////////////////////nuevo texto///////////////////
+String c1="",c2 = "";         
+   for (int i =1; i < largo;i++){
+            c1 = alfanum.substring(i-1, i);
+            c2 = alfanum.substring(i, i+1);
+        if (!isTipo(c1).equals(isTipo(c2))) {  // JOptionPane.showMessageDialog(null,isTipo(c1)+"-"+isTipo(c2));
+           acum=acum+c1+"."; 
+        }else{
+            acum=acum+c1;
+        }
+                           // System.out.println(isTipo(c1)+"-"+isTipo(c2));           
+        } 
+   acum= acum+c2;result=acum;
+////////////////ojo texto original///////////////////
+  /*     StringTokenizer token = new StringTokenizer(t,".");
               while (token.hasMoreTokens()){
               sub = (token.nextToken());
              
               if (!"".equals(sub)){
-                alfanum=alfanum.replace(sub, sub+".");// alfanum=alfanum.replace(sub, sub+".");original
+                alfanum=alfanum.replace(sub,sub+".");// alfanum=alfanum.replace(sub, sub+".");original
                                    }
               }
-              result=alfanum;//JOptionPane.showMessageDialog(null,alfanum);
+              result=alfanum;//JOptionPane.showMessageDialog(null,alfanum);*/
      return result;
  }//SUBFUNCION DENTRO DE ALFANUMERIC
  public String textdelet (String texto){//eliminar textos inecesarios como No,etc K,etc 
@@ -179,7 +187,7 @@ public class descomponer {
       if (segmentos[0].contains("crr")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("car")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("cra")){result=corregirText(texto,segmentos);}
-      if (segmentos[0].contains("kr")){result=corregirText(texto,segmentos);}
+      if ((segmentos[0].contains("kr"))||segmentos[0].contains("krr")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("cll")){result=corregirText(texto,segmentos);}
        if (segmentos[0].contains("calle")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("diag")){result=corregirText(texto,segmentos);}
@@ -318,6 +326,7 @@ public void expresion (String exp){ //String expresion (String exp){
               if (isletra(sub)==true){contltr++;}if (buscar(sub,base)==true){control="ltr";}
              // if ((isletra(sub)==true)&&(sub.length()==1)){vectorabc=vectorabc+sub+",";}//CASO CON MAS DE 2 LETRAS PARA DEFINIR SUBVIA
               if((contnum<3)){
+                  
               if ((contnum>0)&&(isletra(sub)==true)&&(sub.length()==1)&&(!"n".equals(sub))){vectorabc=vectorabc+sub+",";letraabc[contLetra1digito]=sub;contLetra1digito++;}
               }
           //contnum cuenta cada subcadena con datos numericos
@@ -340,10 +349,11 @@ public void expresion (String exp){ //String expresion (String exp){
         sintaxis="null";//JOptionPane.showMessageDialog(null, "error");
         String subviales[] = vectorabc.split(","); 
         if(subviales.length>=3){sintaxis="vialExtra";}//ERROR MAS DE DOS SUBVIALES
-        //cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
-        String exp2="."+exp;
-      if ((exp2.contains(".mz."))&&(exp2.contains(".cs."))){sintaxis="mz";}
+        //if(cardinal1!=null){sintaxis="invertido";}//cardinal1=matchText(cadenaq1,"cl,dg,cr,tv,av");
+        String exp2="."+exp;if ((cardinal1!=null)){}else{
+      if ((exp2.contains(".mz."))||(exp2.contains("mz."))){sintaxis="mz";}
       if ((exp2.contains(".km."))||(exp2.contains("km."))){sintaxis="null";}
+    }
       //if (cardinal1==null){sintaxis="null";}
     }  
 }   
@@ -593,13 +603,14 @@ public String especialcase (String e){
     if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
     if (("vialExtra".equals(sintaxis))&&(cardinal1!=null)){s=7;}//casos con mas de 2 letras para determinar subvia
     if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
-        if((ee.contains(".mz."))&&(ee.contains(".cs."))){s=8;}  ;}
+        if((ee.contains(".mz."))){s=8;}  ;}
     ////////////espacio para otros casos
     if (("null".equals(sintaxis))&&(contltr>0)&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
     if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas
       switch(s){
           case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
-          array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
+             //aqui el algoritmo al tener 3 numeros minimos y unos textos puede comenzar a interpretar arrojar resultados calculados
+              array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
               break;
           case 1:
               e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
@@ -620,13 +631,14 @@ public String especialcase (String e){
                      subvial(e);
                    }
               break; 
-          case 3:
+          case 3: //if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
                if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
                  e= buscarList(e)+ e;inicomponentes();//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
                  e = alfanumeric(e);e = sintax(e); expresion(e);
                   coordenada(e);cardinal(e);subVia(e);subcardinal(e);
               codigo();
                 }else{
+                   //si solo tiene dos numeros y no encontro lista de direcciones nominales entonces o es rural o es un error
                      String segment[] = textIni.split(" ");
                      e="ErrXY: "+arrayTostring(segment);array[0]=503;
               
@@ -662,22 +674,34 @@ public String especialcase (String e){
                            
               break;
           case 8: //CASO DE MANZANAS ERROR 800
+            e=mzSintaxis(e);//es necesario agregar un control de sintaxis y evluar casos lotes
             int pointMz=-1,pointCs=-1;String numMz,numCs;  
               String segmentos2[] = e.split("\\."); //String baseabc = "#abcdefghijklmnopqrstuvwxyz";
               //////////////PRIMERO BUSCAMOS NUMERO DE CASA////////////////////////////
               pointMz = Arrays.asList(segmentos2).indexOf("mz");
-              if((segmentos2[pointMz].length()==2)&&("mz".equals(segmentos2[pointMz]))&&(pointMz+1<segmentos2.length)){
+              if((pointMz>-1)&&(segmentos2[pointMz].length()==2)&&("mz".equals(segmentos2[pointMz]))&&(pointMz+1<segmentos2.length)){
                    numMz= (pointMz==-1)?"":segmentos2[pointMz+1];
                    if(isnumeric(numMz)==true){array[5]=numMz;}else{array[5]=baseabc.indexOf(numMz); }
                     if( "-1".equals(array[5].toString())){array[5]=0;}
               }else{array[5]=0;}
               //////////////SEGUNDO NUMERO DE CASA//////////////////////////////////////
+              //AGREGAR SUBFUNCION DE SINTAXISMZ
+              if ((e.contains(".cs."))||(e.contains("cs."))){
               pointCs= Arrays.asList(segmentos2).indexOf("cs");
-             if((segmentos2[pointCs].length()==2)&&("cs".equals(segmentos2[pointCs]))&&(pointCs+1<segmentos2.length)){
-              numCs= (pointCs==-1)?"": segmentos2[pointCs+1];
-                if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]="0"; }
-                
-              }else{array[8]="0";}
+                    if((pointCs>-1)&&(segmentos2[pointCs].length()==2)&&("cs".equals(segmentos2[pointCs]))&&(pointCs+1<segmentos2.length)){
+                      numCs= (pointCs==-1)?"": segmentos2[pointCs+1];
+                      if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]="0"; }
+                    }else{array[8]="0";}
+              }else{//hasta aqui busca casa y busca despues lote
+                          if ((e.contains(".lt."))||(e.contains("lt."))){
+                            pointCs= Arrays.asList(segmentos2).indexOf("lt");
+                            if((pointCs>-1)&&(segmentos2[pointCs].length()==2)&&("lt".equals(segmentos2[pointCs]))&&(pointCs+1<segmentos2.length)){
+                              numCs= (pointCs==-1)?"": segmentos2[pointCs+1];
+                              if(isnumeric(numCs)==true){array[8]=numCs;}else{array[8]="0"; }
+                            }else{array[8]="0";}
+                  }else{
+                 array[8]="0";}//si al final no encuentra nada asigna cero a la posicion 8 del array 
+                }
              int matchMz = Integer.parseInt(array[5].toString()) , matchCs=Integer.parseInt(array[8].toString());  
              if((matchMz<1)||(matchCs<1)){
               e="ErrMz: "+arrayTostring(segmentos2);array[0]=508;}
@@ -745,15 +769,28 @@ public String codigo (){
         return result;
       
   }
- //<editor-fold defaultstate="collapsed" desc="Generated Code Funciones y Utilidades"> 
+ //<editor-fold defaultstate="collapsed" desc="Generated Code Funciones y Utilidades">
+   private String mzSintaxis(String txt){
+       String result="",newt; newt="."+txt+".";
+       if (newt.contains(".csa.")){newt=newt.replace(".csa.", ".cs.");}
+       if (newt.contains(".cas.")){newt=newt.replace(".cas.", ".cs.");}
+       if (newt.contains(".casa.")){newt=newt.replace(".casa.", ".cs.");}
+       if (newt.contains(".lot.")){newt=newt.replace(".lot.", ".lt.");}
+       if (newt.contains(".c."+numeric2+".")){newt=newt.replace(".c."+numeric2+".", ".cs."+numeric2+".");}
+       newt=newt.replace("..", ".");
+       result=newt.substring(1, newt.length()-1);
+        return result;
+    }
     private String corregir3abc(String txt){//CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR
         //String cadena1=vectorabc.substring(1, vectorabc.length());
-       String caso="",result = "";String subviales1[] = vectorabc.split(",");String numericq="";
-       if(contnum==1){numericq=numeric1;}else{if(contnum==2){numericq=numeric2;}}
+       String caso="",result = "";String subviales1[] = vectorabc.split(",");
+       String segmentos1[] = txt.split("\\.");
+        ArrayList results = toNumericLimite(segmentos1); //devuelve [numero][posicion][cantidad.numeros.contados]
+       int ponintControl= (int) results.get(1);
         if(vectorabc.contains("e")){caso="e";} 
         if(vectorabc.contains("d")){caso="d";}
         if(vectorabc.contains("t")){caso="t";}
-       // if(txt.indexOf(numericq)<txt.indexOf(subviales1[0])){caso="out";}//no determina bien el ultimo numero en sintaxis
+        if(ponintControl<txt.indexOf(subviales1[0])){caso="out";}//no determina bien el ultimo numero en sintaxis txt.indexOf(numericq)
        // if(cardinal1==""){abc3="cardnull";}//pendiente
          switch(caso){
                      
@@ -761,6 +798,13 @@ public String codigo (){
                         txt=txt.replace(".e.", ".este.");result= txt; 
                          break;
                      case "d":
+             //VAMOS A BUSCAR UN CASO ESPECIFICO EJEMPLO 59.B.D.28.A     SI LA EXPRESION ES DE ESA FORMA LA D ES DIAGONA SINO SE IGNORA
+                         String serch= numeric1+"."+subviales1[0]+".d."+numeric2+"."+subviales1[2];
+                         String mod=numeric1+"."+subviales1[0]+".dg."+numeric2+"."+subviales1[2];;
+                         if (txt.contains(serch)){result=txt.replace(serch, mod);
+                         }else{
+                            result=txt.replace(".d.", ".");//segmentos1[ponintControl-1]="." ; 
+                         }
                         //txt=txt.replace(".e.", ".este.");result= txt; 
                          break;   
                      case "t":
@@ -890,7 +934,7 @@ public String codigo (){
         result=text;
         return result;
     } 
-   private String corregirText(String exp, String segmentos[]){
+    private String corregirText(String exp, String segmentos[]){
        String result="";int largo=0;
       ///comenzamos por el inicio de las cadenas casos posicion cero
       largo = segmentos[0].length();
@@ -924,6 +968,9 @@ public String codigo (){
                break;
            case "kr":
             result=  exp.replaceFirst("kr.", "cr.");
+               break; 
+           case "krr":
+            result=  exp.replaceFirst("krr.", "cr.");
                break;    
             case "cll":
             result=  exp.replaceFirst("cll.", "cl.");
@@ -940,14 +987,28 @@ public String codigo (){
        }
        //JOptionPane.showMessageDialog(null, segmentos[0]);
        return result;
-   } 
-   public boolean isnumeric(String text){
+   } //se ejecuta en textdelet
+    public boolean isnumeric(String text){
         boolean bool = text.matches("[0-9]*");
         return bool;
     }
     public boolean isletra(String text){
         boolean bool = text.matches("[a-zA-Z]*");
         return bool;
+    }
+    private String isTipo( String dato){
+        String result="null";
+        if ((isnumeric(dato)==false)&&(isletra(dato)==false)){
+            return "d";//desconocido
+        }
+        if ((isnumeric(dato)==true)&&(isletra(dato)==false)){
+            return "n";//numero
+        }
+        if ((isnumeric(dato)==false)&&(isletra(dato)==true)){
+            return "l";//letra
+        }
+        
+        return null; 
     }
     private boolean buscar(String text, String matriz){
         boolean bool = false;int cont=0;String base [] = matriz.split(",");
@@ -1035,6 +1096,19 @@ public String codigo (){
               }
       acumulador= acumulador.replace("..", ".");       
        return acumulador;       
+    }
+    private ArrayList toNumericLimite(String array[]){
+       ArrayList<Object> retorno = new ArrayList(); //devuelve [numero][posicion][cantidad.numeros.contados]
+       String result="",numero="";int contN=0,cont=0,point=-1;
+       for(String sub:array) {
+           if ((isnumeric(sub)==true)){numero=sub;contN++;}//puede ser un error
+           if ((isnumeric(sub)==true)&&(contN==2)){numero=sub;point=cont;}
+           if ((isnumeric(sub)==true)&&(contN==3)){numero=sub;point=cont;}
+           cont++;
+       }
+       retorno.add(numero);retorno.add(point);retorno.add(contN);
+      // result=numero;//if(contN==2){result=numero;}
+        return retorno;
     }
  // </editor-fold>   
 static void exportar_TextBasura(String valor) throws IOException {

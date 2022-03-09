@@ -6,23 +6,20 @@
 package enruter;
 import static enruter.dirTest.listaDirecciones;
 import java.awt.Color;
-import java.awt.Image;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.JTable;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 /**
  *
  * @author 57321
@@ -37,6 +34,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
       this.Home.setBackground(Color.white);
         btn_procesar.addActionListener(this);
         btn_open1.addActionListener(this);
+        anadeListenerAlModelo(tabla1);
         
     }
 public static void runing(){
@@ -58,6 +56,9 @@ public static void runing(){
               } catch (IOException ex) {
                   Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex);
               }
+         }
+         if (ae.getSource()==tabla1){
+             JOptionPane.showMessageDialog(null, "");	
          }
       }
     
@@ -111,11 +112,12 @@ public static void runing(){
         lbProgreso = new javax.swing.JLabel();
         panelZonas = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaZonas = new javax.swing.JTable();
         btnGuardarZonas = new javax.swing.JButton();
         panelHistoric = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tablaZonas = new javax.swing.JTable();
+        tabla1 = new javax.swing.JTable();
+        jbGuardar = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDirecciones = new javax.swing.JTable();
@@ -329,7 +331,7 @@ public static void runing(){
             HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomeLayout.createSequentialGroup()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 8, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(HomeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lista_ciudades, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -350,7 +352,7 @@ public static void runing(){
 
         jTabbedPane1.addTab("Home", Home);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaZonas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
@@ -415,9 +417,9 @@ public static void runing(){
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
+        jScrollPane1.setViewportView(tablaZonas);
+        if (tablaZonas.getColumnModel().getColumnCount() > 0) {
+            tablaZonas.getColumnModel().getColumn(1).setResizable(false);
         }
 
         btnGuardarZonas.setText("Guardar Zonas");
@@ -444,15 +446,38 @@ public static void runing(){
 
         jTabbedPane1.addTab("Zonas", panelZonas);
 
-        tablaZonas.setModel(new javax.swing.table.DefaultTableModel(
+        tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Direcciones", "Inicio", "Correccion", "Resultado"
             }
-        ));
-        jScrollPane2.setViewportView(tablaZonas);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tabla1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tabla1KeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tabla1KeyReleased(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tabla1);
+
+        jbGuardar.setText("Guardar Cambios");
+        jbGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbGuardarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelHistoricLayout = new javax.swing.GroupLayout(panelHistoric);
         panelHistoric.setLayout(panelHistoricLayout);
@@ -460,18 +485,24 @@ public static void runing(){
             panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelHistoricLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(21, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelHistoricLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jbGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(202, 202, 202))
         );
         panelHistoricLayout.setVerticalGroup(
             panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelHistoricLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addGap(7, 7, 7)
+                .addComponent(jbGuardar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Historic", panelHistoric);
+        jTabbedPane1.addTab("NoProcesadas", panelHistoric);
 
         jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
@@ -513,7 +544,7 @@ public static void runing(){
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(Ordenar, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addComponent(Ordenar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -532,7 +563,7 @@ public static void runing(){
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -612,10 +643,18 @@ public static void runing(){
 
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
        try{
+           
+        /*   tabla1.getModel().addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent evento) {
+             
+            }
+        });*/
         if (jTabbedPane1.getSelectedIndex()==2){
             // historicZonas.zonash.get(0); JOptionPane.showMessageDialog(null, historicZonas.baseZonasH[0][0]);
-            DefaultTableModel model =  (DefaultTableModel) tablaZonas.getModel();
-            tablaZonas.setValueAt(23, 0, 0);
+            DefaultTableModel model =  (DefaultTableModel) tabla1.getModel();
+            //tabla1.setValueAt(23, 0, 0);
             Object nuevo[]= {"",};
             model.addRow(nuevo);//tablaZonas.setModel(model);
         }
@@ -623,16 +662,10 @@ public static void runing(){
            llenarTable();
         }
        }catch(Exception e){
-             ;//JOptionPane.showMessageDialog(null, "error");
+             JOptionPane.showMessageDialog(null, "Error: "+e);
     }//tablaDirecciones.removeRowSelectionInterval(0, tablaDirecciones.getRowCount());
     }//GEN-LAST:event_jTabbedPane1MouseClicked
-  /*  public  void ajustaricon(){
-        lbProcesando.setSize(300, 400);
-        ImageIcon fot = new ImageIcon("C:\\Users\\57321\\Pictures\\procesando.gif");
-   Icon icono = new ImageIcon(fot.getImage().getScaledInstance(lbProcesando.getWidth(), lbProcesando.getHeight(), Image.SCALE_DEFAULT));
-       lbProcesando.setIcon(icono);
-        this.repaint();
-    }*/
+
     private void llenarTable(){
           int cont=0;
              if(tablaDirecciones.getRowCount()!=0){}else{
@@ -703,19 +736,97 @@ public static void runing(){
       }
      }
     }//GEN-LAST:event_lista_ciudadesItemStateChanged
-
+    
     private void btnCsvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCsvActionPerformed
             try {
           Excel ex = new Excel();
   
           ex.importCsv();
+          llenarTable(descomponer.DirErrColect);//JOptionPane.showMessageDialog(null, descomponer.DirErrColect);
          descomponer.exportar_TextBasura(new String(descomponer.garbagColect.getBytes("ISO-8859-1"), "UTF-8"));// JOptionPane.showMessageDialog(null,descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
     }//GEN-LAST:event_btnCsvActionPerformed
- 
- 
+
+    private void tabla1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla1KeyReleased
+        // TODO add your handling code here:
+       
+        
+    }//GEN-LAST:event_tabla1KeyReleased
+    private void llenarTable(String matrizDoComas){
+        if("".equals(matrizDoComas)){return;}
+        String segmentos[] = matrizDoComas.split(",");
+        DefaultTableModel model =  (DefaultTableModel) tabla1.getModel();
+        
+        for(String seg:segmentos){
+            String segmentos2[] = seg.split("\\.");
+               if(!"".equals(seg)){ 
+                Object nuevo[]={seg,segmentos2[0],"",""};
+                model.addRow(nuevo);
+               }
+        }
+        
+    }
+    private void jbGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbGuardarActionPerformed
+        // TODO add your handling code here: boton para la tabla de resultados con error XY y guargar una matriz dinamica de correccion personalizada por el usuario
+        int filas = tabla1.getRowCount();//JOptionPane.showMessageDialog(null, );
+        for (int cont=0; cont<filas;cont++){
+            String err=String.valueOf(tabla1.getValueAt(cont,1));
+              String dato=String.valueOf(tabla1.getValueAt(cont,2));
+            if(tabla1.getValueAt(cont,3)==null){}else{      
+               if((!"".equals(err))&&(!"".equals(dato))){      
+                     JOptionPane.showMessageDialog(null,err +"#"+dato );
+                 }
+              } 
+        }
+    }//GEN-LAST:event_jbGuardarActionPerformed
+
+    private void tabla1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla1KeyPressed
+        // TODO add your handling code here:
+        
+         if(evt.getKeyCode()==10){
+                //JOptionPane.showMessageDialog(null, dir +"#"+mod);
+                
+        }
+    }//GEN-LAST:event_tabla1KeyPressed
+      private void anadeListenerAlModelo(JTable tabla) {
+        tabla.getModel().addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent evento) {
+               actualizartabla1(evento);
+            }
+        });
+      }
+      public void actualizartabla1(TableModelEvent evento){
+           if (evento.getType() == TableModelEvent.UPDATE) {
+
+            // Se obtiene el modelo de la tabla y la fila/columna que han cambiado.
+            TableModel modelo = ((TableModel) (evento.getSource()));
+            int fila = evento.getFirstRow();
+            int columna = evento.getColumn();
+
+            // Los cambios en la ultima fila y columna se ignoran.
+            // Este return es necesario porque cuando nuestro codigo modifique
+            // los valores de las sumas en esta fila y columna, saltara nuevamente
+            // el evento, metiendonos en un bucle recursivo de llamadas a este
+            // metodo.
+            if (fila == 2 || columna == 3) {
+                return;
+            }
+            
+            updateCell();//JOptionPane.showMessageDialog(null,fila) ;
+           }
+      }
+      private void updateCell(){
+          int row = tabla1.getSelectedRow(); 
+              String dir=String.valueOf(tabla1.getValueAt(row,0));
+              String err=String.valueOf(tabla1.getValueAt(row,1));
+              String dato=String.valueOf(tabla1.getValueAt(row,2));
+              String mod=dir.replaceFirst(err+".", dato+".");
+              tabla1.setValueAt(mod,row , 3);
+      }
     /**
      * @param args the command line arguments
      */
@@ -775,7 +886,7 @@ public static void runing(){
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JButton jbGuardar;
     private javax.swing.JLabel lbProgreso;
     private javax.swing.JLabel lb_codigo;
     private javax.swing.JLabel lb_zona;
@@ -784,6 +895,7 @@ public static void runing(){
     private javax.swing.JComboBox<String> lista_ciudades;
     private javax.swing.JPanel panelHistoric;
     private javax.swing.JPanel panelZonas;
+    private javax.swing.JTable tabla1;
     private javax.swing.JTable tablaDirecciones;
     private javax.swing.JTable tablaZonas;
     private javax.swing.JTextField txt_entrada;

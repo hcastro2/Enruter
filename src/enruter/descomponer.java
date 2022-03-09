@@ -1,6 +1,6 @@
 package enruter;
 
-import com.sun.tools.javac.util.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +25,7 @@ import javax.swing.JFileChooser;
 public class descomponer {
 // la idea es tomar el texto original y eliminar los posibles errores y particularidades del lenguaje comun    
     public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
-    String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni,garbagColect="";
+    String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni,garbagColect="",DirErrColect="";
     String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cadena2num,cardinal1,cardinal2;
   
   public void inicomponentes() {
@@ -139,7 +139,7 @@ public class descomponer {
        return result;
                                         } 
     public String separar (String alfanum){
-     String result="",a,l="",n="",t="",sub,acum="";int largo = alfanum.length(); //char a,b = 0;
+     String result,acum="";int largo = alfanum.length(); //char a,b = 0;     String result="",a,l="",n="",t="",sub,acum="";int largo = alfanum.length(); //char a,b = 0;
      
     /*    for (int i =0; i < largo;i++){
             a = alfanum.substring(i, i+1);
@@ -199,7 +199,7 @@ String c1="",c2 = "";
        return result;
                                         }
  public String sintax (String txt) { //POSICION.LARGO.CASO.SUBCADENA///////////////
-    int contnumeros=0;String acumulador=".",acumulador2=".",garbagetxt="",cola=".",cola2=".";String sub="";// es necesario que previamente se tome el texto hasta el final del 3 numero
+    int contnumeros=0;String acumulador=".",acumulador2=".",garbagetxt="",cola=".",cola2=".";String sub="",numPrimo="";// es necesario que previamente se tome el texto hasta el final del 3 numero
     StringTokenizer token = new StringTokenizer(txt,".");
               while (token.hasMoreTokens()){
                   sub = (token.nextToken());
@@ -207,7 +207,7 @@ String c1="",c2 = "";
                   if (contnumeros<2){acumulador2=acumulador2+"."+sub;}else{cola2=cola2+"."+sub;}
                   if (contnumeros<3){acumulador=acumulador+"."+sub;}else{cola=cola+"."+sub;}
                   if (isnumeric(sub)==true){contnumeros++;} 
-                  
+                  if((isnumeric(sub)==true)&&(contnumeros==1)){numPrimo=sub;}
               }
       //exportar_TextBasura(        
    if(garbagetxt.length()>=1){
@@ -236,10 +236,15 @@ String c1="",c2 = "";
                   if (caso==2){subcadena.add(caso+","+point+","+largo);}
                   if (caso==5){subcadena.add(caso+","+point+","+largo);}
                     }
+ ///////////////////MODIFICAR YA QUE NO CUMPLE: CONTROL ENTRE EL PRIMER NUMERO Y EL ULTIMO////////////////
+  int pointMin=-1;//punto de inicio de la correccion de sintaxis 
+   if("".equals(numPrimo)){}else{
+   pointMin=txt.indexOf("."+numPrimo+".");}
+ 
  /////////////////////////CONTROLAMOS QUE EL TEXTO ESPECIAL ESTE ENTRE EL PRIMER CARDINAL Y EL ULTIMO NUMERO///////////////////////////////////////////////////////////////////////////////
-     String control = matchText(txt,"cl,dg,cr,tv,av");int bandera;
-    if(control==null){bandera=-1;}else{ 
-        bandera=txt.indexOf("."+control+".");}
+     String control = matchText(txt,"cl,dg,cr,tv,av");int bandera;//
+    if((control==null)||(contnumeros<=1)){bandera=-1;}else{       // if((control==null)){bandera=-1;}else{ 
+        bandera=txt.indexOf("."+control+".");}                    // 
  //////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////CORREGIR CASOS ESPECIALES DE SINTAXIS/////////////////////
        cont=0; 
@@ -247,7 +252,7 @@ String c1="",c2 = "";
             String original,reemplazo;
             sub=subcadena.get(cont);int w = Integer.parseInt(sub.substring(0,1));int inicio,larg;
               Object  dato[]= sub.split(",");
-              if ((Integer.parseInt((String)dato[1])<bandera)||(bandera==-1)){}else{
+              if ((Integer.parseInt((String)dato[1])<bandera)||(bandera==-1)||(Integer.parseInt((String)dato[1])<pointMin)){}else{
               switch(w){
                 case 0:
              
@@ -546,7 +551,7 @@ public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=
 }//evaluar cuando el numero2 es igual al numero3 no calcula bien
 private void subVia(String s){
    try{ 
-    int control = contLetra1digito,cont=0;int point;String cadena1,cadena2;
+    int control = contLetra1digito;int point;String cadena1,cadena2;
     int match1 = -1,match2 = -1,letra1 = 0,letra2 = 0;String z= cadenaq1+cadenaq2;
     point = z.indexOf("."+numeric1+".");//buscamos descomponer la cadena en dos partes SE EXCLUYE  N, Ñ, O, W
       String base[] = {"cl","dg","cr","tv"}; String baseabc = "#abcdefghijklmprstuv"; 
@@ -611,6 +616,7 @@ public String especialcase (String e){
           case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
              //aqui el algoritmo al tener 3 numeros minimos y unos textos puede comenzar a interpretar arrojar resultados calculados
               array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
+              DirErrColect=DirErrColect+e+",";//guarda las direcciones con dificultad para leer
               break;
           case 1:
               e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
@@ -618,7 +624,7 @@ public String especialcase (String e){
           if (e.contains(".cr.")==true){array[5]=2;} if (e.contains(".tv.")==true){array[5]=3;} 
               break;
           case 2://casos de avenidas
-               if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
+               if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
                  e= buscarList(e)+ e;
                  coordenada(e);
                  cardinal(e);
@@ -632,7 +638,7 @@ public String especialcase (String e){
                    }
               break; 
           case 3: //if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
-               if (buscarList(e) !="null"){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
+               if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
                  e= buscarList(e)+ e;inicomponentes();//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
                  e = alfanumeric(e);e = sintax(e); expresion(e);
                   coordenada(e);cardinal(e);subVia(e);subcardinal(e);
@@ -1110,6 +1116,7 @@ public String codigo (){
       // result=numero;//if(contN==2){result=numero;}
         return retorno;
     }
+  
  // </editor-fold>   
 static void exportar_TextBasura(String valor) throws IOException {
 
@@ -1148,9 +1155,9 @@ static void exportar_TextBasura(String valor) throws IOException {
 ///////////////FUNCIONES CON MANEJO DE FICHEROS EXPORTACION E IMPORTACION
 class ListaDirecciones{
     static String dir;
-    static ArrayList<String> dirs = new ArrayList<String>() ; 
-    static ArrayList<String> dirsPrevias = new ArrayList<String>();
-    static ArrayList<String> expresionResult = new ArrayList<String>();
+    static ArrayList<String> dirs = new ArrayList<>() ; 
+    static ArrayList<String> dirsPrevias = new ArrayList<>();
+    static ArrayList<String> expresionResult = new ArrayList<>();
     static String checklist;
     public  void FileTextRead() throws IOException {//FUNCION IMPORTAR BASE DE VIAS CON NOMBRES PARTICULARES
     String file=null; 
@@ -1180,7 +1187,7 @@ class ListaDirecciones{
     //Copio un valor a la celda 
     //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
     currentRecord = InputFile.readLine();
-    if (currentRecord != ""){
+    if (!"".equals(currentRecord)){
        dirs.add(currentRecord);
     }
 
@@ -1188,7 +1195,7 @@ class ListaDirecciones{
     //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
 
     }
-    catch (Exception ex) {
+    catch (IOException ex) {
     }
     }
     //JOptionPane.showMessageDialog(null,"Base de direcciones cargada");
@@ -1245,7 +1252,7 @@ class ListaDirecciones{
     //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
     currentRecord = InputFile.readLine();
     expresionResult.add(d.texting(currentRecord)+"|"+d.codigo());
-    if (currentRecord != ""){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
+    if (!"".equals(currentRecord)){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
        dirsPrevias.add(currentRecord);i++;
     }
 
@@ -1253,7 +1260,7 @@ class ListaDirecciones{
     //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
 
     }
-    catch (Exception ex) {
+    catch (IOException ex) {
     }
     }
     JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
@@ -1285,7 +1292,7 @@ public void importarDirTest() throws IOException{
      int i = 0;String file=null;
     ///////////////// codigo que invoca la clase para procesar las direcciones
      clearFile();//limpiamos el archivo donde se guardan los resultados si existe
-    direcciones = new ArrayList<String>() ;
+    direcciones = new ArrayList<>() ;
     listaDirecciones = new ArrayList<idDirZona>();
      ///////////////////////////////////////////////////////////////////////////////////////////////
     JFileChooser fc = new JFileChooser();
@@ -1314,7 +1321,7 @@ public void importarDirTest() throws IOException{
     //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
     currentRecord = InputFile.readLine();
    
-    if (currentRecord != ""){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
+    if (!"".equals(currentRecord)){ // JOptionPane.showMessageDialog(null,expresionResult.get(i)+"\n"+d.array[11]);
        // descomponer d = new descomponer();String result=d.texting(currentRecord);String value=d.codigo();
        direcciones.add(currentRecord);i++;//exportar_datos(String.valueOf(i)+"#"+currentRecord);
     }
@@ -1323,7 +1330,7 @@ public void importarDirTest() throws IOException{
     //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
 
     }
-    catch (Exception ex) {
+    catch (IOException ex) {
     }
     }
     JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
@@ -1417,11 +1424,11 @@ public void procesarLista( ) throws IOException{
 
 class ciudades{
     static ArrayList<String> ciudades;
-    static Map <String ,String> mapCiud = new HashMap<String, String> ();
+    static Map <String ,String> mapCiud = new HashMap<> ();
     static int ciudadGlobal;
      public  void importCiudades() throws IOException {//FUNCION IMPORTAR BASE DE VIAS CON NOMBRES PARTICULARES
     String file=null; 
-    ciudades = new ArrayList<String>();
+    ciudades = new ArrayList<>();
     String ruta = System.getProperty("user.dir");   
     FileReader myFile = null;
     file =ruta+"\\ciudades.txt";  
@@ -1447,7 +1454,7 @@ class ciudades{
     //Copio un valor a la celda 
     //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
     currentRecord = InputFile.readLine();
-    if (currentRecord != ""){
+    if (!"".equals(currentRecord)){
        ciudades.add(currentRecord);
     }
 
@@ -1455,7 +1462,7 @@ class ciudades{
     //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
 
     }
-    catch (Exception ex) {
+    catch (IOException ex) {
     }
     }
     //JOptionPane.showMessageDialog(null,"Base de direcciones cargada");

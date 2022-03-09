@@ -3,11 +3,7 @@ package enruter;
 
 
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -228,6 +224,7 @@ public  void importCsv() throws IOException {
 ///////////////////////////////////////////////////////////////////////////////////////////////
          JOptionPane.showMessageDialog(null, "Proceso Finalizado");
       } catch (Exception e) {
+          //JOptionPane.showMessageDialog(null, e.getStackTrace());
          if (null!=br) {
             br.close();}
       }  

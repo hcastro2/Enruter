@@ -462,14 +462,6 @@ public static void runing(){
                 return canEdit [columnIndex];
             }
         });
-        tabla1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                tabla1KeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tabla1KeyReleased(evt);
-            }
-        });
         jScrollPane2.setViewportView(tabla1);
 
         jbGuardar.setText("Guardar Cambios");
@@ -748,12 +740,8 @@ public static void runing(){
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
     }//GEN-LAST:event_btnCsvActionPerformed
-
-    private void tabla1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla1KeyReleased
-        // TODO add your handling code here:
-       
-        
-    }//GEN-LAST:event_tabla1KeyReleased
+   
+     //<editor-fold defaultstate="collapsed" desc="FUNCIONES Y CODIGOS JTABLE NOCORREGIDOS">
     private void llenarTable(String matrizDoComas){
         if("".equals(matrizDoComas)){return;}
         String segmentos[] = matrizDoComas.split(",");
@@ -781,15 +769,6 @@ public static void runing(){
               } 
         }
     }//GEN-LAST:event_jbGuardarActionPerformed
-
-    private void tabla1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabla1KeyPressed
-        // TODO add your handling code here:
-        
-         if(evt.getKeyCode()==10){
-                //JOptionPane.showMessageDialog(null, dir +"#"+mod);
-                
-        }
-    }//GEN-LAST:event_tabla1KeyPressed
       private void anadeListenerAlModelo(JTable tabla) {
         tabla.getModel().addTableModelListener(new TableModelListener() {
 
@@ -827,6 +806,7 @@ public static void runing(){
               String mod=dir.replaceFirst(err+".", dato+".");
               tabla1.setValueAt(mod,row , 3);
       }
+   //</editor-fold>   
     /**
      * @param args the command line arguments
      */

@@ -4,9 +4,12 @@ package enruter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -27,7 +31,7 @@ public class descomponer {
     public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
     String letraabc []= new String[2],sintaxis,vectorabc=""; Double valor=0.0;static String textIni,garbagColect="",DirErrColect="";
     String cadenaq1=".",cadenaq2=".",cadenaq3=".",cadena3num,cadena2num,cardinal1,cardinal2;
-  
+   static Map <String ,String> dirsXYnull = new HashMap<> ();
   public void inicomponentes() {
         this.finnumericos = "";
         this.numeric1 = "";this.numeric2 = "";this.numeric3 = "";
@@ -613,17 +617,26 @@ public String especialcase (String e){
     if (("null".equals(sintaxis))&&(contltr>0)&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
     if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas
       switch(s){
-          case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
+        case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
              //aqui el algoritmo al tener 3 numeros minimos y unos textos puede comenzar a interpretar arrojar resultados calculados
+             String segmentos[] = e.split("\\.");
+           Boolean control=  dirsXYnull.containsKey(segmentos[0].toString());
+           String valor = dirsXYnull.get(segmentos[0].toString());
+            if(valor!=null){
+                e=e.replaceFirst(segmentos[0]+".", valor+".");
+                coordenada(e);cardinal(e);subVia(e);subcardinal(e);codigo();
+            }else{
+                         
               array[0]=100;array[2]=numeric1;array[5]=numeric2;array[7]=numeric3;array[8]=0;// JOptionPane.showMessageDialog(null, "Se requiere definir calle carrera o nomenclatura similar");
               DirErrColect=DirErrColect+e+",";//guarda las direcciones con dificultad para leer
+            }
               break;
           case 1:
               e="."+e+".";//AQUI EXISTEN DATOS DE CALLE O CARRERA PERO NO EXISTE NINGUN NUMERO:CODIGO 200
           array[0]=102; if (e.contains(".cl.")==true){array[2]=0;} if (e.contains(".dg.")==true){array[2]=1;}
           if (e.contains(".cr.")==true){array[5]=2;} if (e.contains(".tv.")==true){array[5]=3;} 
               break;
-          case 2://casos de avenidas
+        case 2://casos de avenidas
                if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
                  e= buscarList(e)+ e;
                  coordenada(e);
@@ -637,7 +650,7 @@ public String especialcase (String e){
                      subvial(e);
                    }
               break; 
-          case 3: //if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
+        case 3: //if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
                if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
                  e= buscarList(e)+ e;inicomponentes();//JOptionPane.showMessageDialog(null,sintax(e));// coordenada(e);cardinal(e);subvial(e);codigo();
                  e = alfanumeric(e);e = sintax(e); expresion(e);
@@ -650,17 +663,17 @@ public String especialcase (String e){
               
                 }
               break;
-          case 4://AQUI COTEJAMOS LOS CASOS QUE LLEVAN EL INDICADOR KM KILOMETRO CODIGO 400
+        case 4://AQUI COTEJAMOS LOS CASOS QUE LLEVAN EL INDICADOR KM KILOMETRO CODIGO 400
              array[0]=400;array[2]=numeric1;array[3]=numeric2;array[4]=numeric3;array[8]=0; //JOptionPane.showMessageDialog(null, "si");
               break;
-          case 5://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
+        case 5://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
              cardinal(e);array[0]=105;
               break; 
-          case 6://AQUI COTEJAMOS LOS CASOS CON NOMENCLATURA INVERTIDA
+        case 6://AQUI COTEJAMOS LOS CASOS CON NOMENCLATURA INVERTIDA
              String nuevoText=invertir(e);inicomponentes();
              texting(nuevoText);
               break; 
-          case 7://CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR 700
+        case 7://CASOS CON MAS DE UNA LETRA PARA SUBVIAL O CORDENADA ERROR 700
             
             String newE =  corregir3abc(e);//
                 
@@ -679,7 +692,7 @@ public String especialcase (String e){
              }
                            
               break;
-          case 8: //CASO DE MANZANAS ERROR 800
+        case 8: //CASO DE MANZANAS ERROR 800
             e=mzSintaxis(e);//es necesario agregar un control de sintaxis y evluar casos lotes
             int pointMz=-1,pointCs=-1;String numMz,numCs;  
               String segmentos2[] = e.split("\\."); //String baseabc = "#abcdefghijklmnopqrstuvwxyz";
@@ -714,7 +727,7 @@ public String especialcase (String e){
               
               
               break;
-          case 9://IDEA:ORGANIZAR EN ORDEN ALFABETICO
+         case 9://IDEA:ORGANIZAR EN ORDEN ALFABETICO
               String letra1= e.substring(0,1);int posicion=0;
               if (isletra(letra1)==true){posicion=baseabc.indexOf(letra1);}
               e=e;array[7]=contnum;array[8]=posicion;//numeric1;
@@ -1116,6 +1129,7 @@ public String codigo (){
       // result=numero;//if(contN==2){result=numero;}
         return retorno;
     }
+   
   
  // </editor-fold>   
 static void exportar_TextBasura(String valor) throws IOException {
@@ -1203,14 +1217,14 @@ class ListaDirecciones{
      
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+      JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+       JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
             }//fin del if
@@ -1267,14 +1281,14 @@ class ListaDirecciones{
     //checklist = " "+i+" Registros";
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
             }//fin del if 
@@ -1337,14 +1351,14 @@ public void importarDirTest() throws IOException{
     //checklist = " "+i+" Registros";
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
             }//fin del if 
@@ -1470,14 +1484,14 @@ class ciudades{
      
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
             }//fin del if

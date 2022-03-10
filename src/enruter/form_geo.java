@@ -6,18 +6,22 @@
 package enruter;
 import static enruter.dirTest.listaDirecciones;
 import java.awt.Color;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 /**
@@ -29,25 +33,36 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
   static String datoGlobal;
     public form_geo() {
         initComponents();
-    //lbProcesando.setVisible(false);//  ajustaricon();
+        leerPropieties();
+      lbProgreso.setVisible(false);//  ajustaricon();
       this.getContentPane().setBackground(Color.white);
       this.Home.setBackground(Color.white);
         btn_procesar.addActionListener(this);
         btn_open1.addActionListener(this);
         anadeListenerAlModelo(tabla1);
-        
+        checkColumn2.addActionListener(this);
     }
 public static void runing(){
    
             //lb_zona.setText(datoGlobal); 
     
 }
-
+// public static Properties config = new Properties();
+  
     
      @Override
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource()==btn_procesar){
              agregarTotxt(btn_procesar.getText());	
+         }
+        if (ae.getSource()==checkColumn2){
+            Object[] estado= checkColumn2.getSelectedObjects();
+           
+          if (estado==null){   ;return;}  
+            if (estado[0]=="Editar"){
+       
+            }
+             
          }
         if (ae.getSource()==btn_open1){
                ListaDirecciones l = new ListaDirecciones();
@@ -118,6 +133,9 @@ public static void runing(){
         jScrollPane2 = new javax.swing.JScrollPane();
         tabla1 = new javax.swing.JTable();
         jbGuardar = new javax.swing.JButton();
+        btRowMas = new javax.swing.JButton();
+        btRowMenos = new javax.swing.JButton();
+        checkColumn2 = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDirecciones = new javax.swing.JTable();
@@ -125,6 +143,9 @@ public static void runing(){
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -200,13 +221,13 @@ public static void runing(){
             }
         });
 
-        checklist_dirs.setText("Listado Direcciones:");
+        checklist_dirs.setText("Listado Dirs:");
 
         btn_open1.setText("...");
 
         lb_zonas.setText("Zonas");
 
-        lb_zonasHistoric.setText("Zonas Historicas");
+        lb_zonasHistoric.setText("Historic Zonas:");
         lb_zonasHistoric.setPreferredSize(new java.awt.Dimension(29, 14));
 
         btn_zonalHistoric.setText("jButton1");
@@ -241,9 +262,9 @@ public static void runing(){
         jLayeredPane1Layout.setHorizontalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane1Layout.createSequentialGroup()
+                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(importarDirs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btn_limpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -255,21 +276,19 @@ public static void runing(){
                                     .addGroup(jLayeredPane1Layout.createSequentialGroup()
                                         .addComponent(btnCsv, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(btnExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(25, 25, 25))
-                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                                        .addComponent(btnExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane1Layout.createSequentialGroup()
                         .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(lb_zonas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(checklist_dirs, javax.swing.GroupLayout.Alignment.LEADING))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btn_open1, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btn_zonal, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                    .addComponent(btn_zonalHistoric, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(lb_zonas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(checklist_dirs, javax.swing.GroupLayout.Alignment.LEADING))
                             .addComponent(lb_zonasHistoric, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btn_open1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_zonal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_zonalHistoric, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(25, 25, 25))
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -286,19 +305,22 @@ public static void runing(){
                     .addComponent(btnExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCsv, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(56, 56, 56)
-                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(checklist_dirs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(checklist_dirs)
                     .addComponent(btn_open1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lb_zonas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lb_zonas)
                     .addComponent(btn_zonal, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lb_zonasHistoric, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btn_zonalHistoric, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lb_zonasHistoric, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE)
+                    .addComponent(btn_zonalHistoric, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
+
+        lbProgreso.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Procesando1.gif"))); // NOI18N
+        lbProgreso.setText("Procesando");
 
         javax.swing.GroupLayout HomeLayout = new javax.swing.GroupLayout(Home);
         Home.setLayout(HomeLayout);
@@ -307,24 +329,21 @@ public static void runing(){
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HomeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(HomeLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txt_entrada)
-                            .addComponent(lista_ciudades, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txt_result, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(HomeLayout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(HomeLayout.createSequentialGroup()
-                                        .addComponent(lb_codigo, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                    .addGroup(HomeLayout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(txt_entrada)
+                        .addComponent(lista_ciudades, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txt_result, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(HomeLayout.createSequentialGroup()
+                            .addGap(14, 14, 14)
+                            .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(HomeLayout.createSequentialGroup()
+                                    .addComponent(lb_codigo, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(246, Short.MAX_VALUE))
         );
         HomeLayout.setVerticalGroup(
@@ -345,9 +364,9 @@ public static void runing(){
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45))
+                .addGap(40, 40, 40)
+                .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Home", Home);
@@ -455,7 +474,7 @@ public static void runing(){
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, false
+                false, true, true, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -471,24 +490,55 @@ public static void runing(){
             }
         });
 
+        btRowMas.setText("+");
+        btRowMas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRowMasActionPerformed(evt);
+            }
+        });
+
+        btRowMenos.setText("-");
+        btRowMenos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRowMenosActionPerformed(evt);
+            }
+        });
+
+        checkColumn2.setText("Editar");
+        checkColumn2.setFocusPainted(false);
+
         javax.swing.GroupLayout panelHistoricLayout = new javax.swing.GroupLayout(panelHistoric);
         panelHistoric.setLayout(panelHistoricLayout);
         panelHistoricLayout.setHorizontalGroup(
             panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelHistoricLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelHistoricLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jbGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(202, 202, 202))
+                .addGroup(panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelHistoricLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(checkColumn2)
+                        .addGap(41, 41, 41)
+                        .addComponent(jbGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(134, 134, 134)
+                        .addComponent(btRowMas)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btRowMenos)
+                        .addGap(29, 29, 29))
+                    .addGroup(panelHistoricLayout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(21, Short.MAX_VALUE))))
         );
         panelHistoricLayout.setVerticalGroup(
             panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelHistoricLayout.createSequentialGroup()
                 .addGap(7, 7, 7)
-                .addComponent(jbGuardar)
+                .addGroup(panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btRowMas, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btRowMenos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jbGuardar)
+                        .addComponent(checkColumn2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(16, Short.MAX_VALUE))
@@ -635,21 +685,14 @@ public static void runing(){
 
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
        try{
-           
-        /*   tabla1.getModel().addTableModelListener(new TableModelListener() {
-
-            @Override
-            public void tableChanged(TableModelEvent evento) {
-             
-            }
-        });*/
-        if (jTabbedPane1.getSelectedIndex()==2){
+      
+       /* if (jTabbedPane1.getSelectedIndex()==2){
             // historicZonas.zonash.get(0); JOptionPane.showMessageDialog(null, historicZonas.baseZonasH[0][0]);
             DefaultTableModel model =  (DefaultTableModel) tabla1.getModel();
             //tabla1.setValueAt(23, 0, 0);
             Object nuevo[]= {"",};
             model.addRow(nuevo);//tablaZonas.setModel(model);
-        }
+        }*/
          if (jTabbedPane1.getSelectedIndex()==3){
            llenarTable();
         }
@@ -730,10 +773,11 @@ public static void runing(){
     }//GEN-LAST:event_lista_ciudadesItemStateChanged
     
     private void btnCsvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCsvActionPerformed
-            try {
+           
+        try {
           Excel ex = new Excel();
-  
-          ex.importCsv();
+          lbProgreso.setVisible(true);
+          ex.importCsv();lbProgreso.setVisible(false);
           llenarTable(descomponer.DirErrColect);//JOptionPane.showMessageDialog(null, descomponer.DirErrColect);
          descomponer.exportar_TextBasura(new String(descomponer.garbagColect.getBytes("ISO-8859-1"), "UTF-8"));// JOptionPane.showMessageDialog(null,descomponer.garbagColect);
       } catch (IOException ex1) {
@@ -742,6 +786,7 @@ public static void runing(){
     }//GEN-LAST:event_btnCsvActionPerformed
    
      //<editor-fold defaultstate="collapsed" desc="FUNCIONES Y CODIGOS JTABLE NOCORREGIDOS">
+   
     private void llenarTable(String matrizDoComas){
         if("".equals(matrizDoComas)){return;}
         String segmentos[] = matrizDoComas.split(",");
@@ -758,25 +803,38 @@ public static void runing(){
     }
     private void jbGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbGuardarActionPerformed
         // TODO add your handling code here: boton para la tabla de resultados con error XY y guargar una matriz dinamica de correccion personalizada por el usuario
-        int filas = tabla1.getRowCount();//JOptionPane.showMessageDialog(null, );
+        int filas = tabla1.getRowCount();int conta=0;//JOptionPane.showMessageDialog(null, );
         for (int cont=0; cont<filas;cont++){
             String err=String.valueOf(tabla1.getValueAt(cont,1));
               String dato=String.valueOf(tabla1.getValueAt(cont,2));
-            if(tabla1.getValueAt(cont,3)==null){}else{      
-               if((!"".equals(err))&&(!"".equals(dato))){      
-                     JOptionPane.showMessageDialog(null,err +"#"+dato );
+            if((tabla1.getValueAt(cont,3)!=null)){      
+               if((!"".equals(err))&&(!"".equals(dato))){ 
+                   descomponer.dirsXYnull.put(err, dato);
+                     conta++;
                  }
-              } 
+              }else{return;}
         }
+        JOptionPane.showMessageDialog(null,conta +" Elementos Guardados" );
     }//GEN-LAST:event_jbGuardarActionPerformed
-      private void anadeListenerAlModelo(JTable tabla) {
-        tabla.getModel().addTableModelListener(new TableModelListener() {
 
-            @Override
-            public void tableChanged(TableModelEvent evento) {
-               actualizartabla1(evento);
-            }
-        });
+    private void btRowMasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRowMasActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model2 =  (DefaultTableModel) tabla1.getModel();
+            
+            Object nuevo[]= {};
+            model2.addRow(nuevo);
+    }//GEN-LAST:event_btRowMasActionPerformed
+
+    private void btRowMenosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRowMenosActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model2 =  (DefaultTableModel) tabla1.getModel();
+        int fila = tabla1.getSelectedRow();
+        if (fila >= 0) {
+            model2.removeRow(fila);
+        }
+    }//GEN-LAST:event_btRowMenosActionPerformed
+      private void anadeListenerAlModelo(JTable tabla) {
+        tabla.getModel().addTableModelListener(this::actualizartabla1);
       }
       public void actualizartabla1(TableModelEvent evento){
            if (evento.getType() == TableModelEvent.UPDATE) {
@@ -806,7 +864,61 @@ public static void runing(){
               String mod=dir.replaceFirst(err+".", dato+".");
               tabla1.setValueAt(mod,row , 3);
       }
-   //</editor-fold>   
+     
+  
+   //</editor-fold> 
+    
+              
+    private void escribirPropiedades(){
+        int cont=descomponer.dirsXYnull.size();String llavesXY="";
+        try{
+            
+            //p.setProperty("user", "zambra");p.store(fOutputStream, "");
+            if(cont>0){
+                for (String key : descomponer.dirsXYnull.keySet()) {
+                    llavesXY=llavesXY+key+","+descomponer.dirsXYnull.get(key)+ ";";
+	        System.out.println(key + " = " + descomponer.dirsXYnull.get(key)); 
+	        }
+            Properties p = new Properties();  
+            FileOutputStream fOutputStream = new FileOutputStream("propiedades.properties");    
+             p.setProperty("dirsXY", llavesXY);p.store(fOutputStream, "");
+            fOutputStream.close();   
+            } 
+            
+     
+        } catch(IOException e){
+            JOptionPane.showMessageDialog(null, "Error guardando configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void leerPropieties() {
+        
+        
+        try{
+           String llavesXY="";
+           Properties propiedades = new Properties();
+           propiedades.load(new FileReader("propiedades.properties"));
+           llavesXY = propiedades.getProperty("dirsXY");
+           String texto[]=  llavesXY.split(";");
+           if(texto.length>0){
+               for(String txt:texto){
+                   String seg[]=  txt.split(",");
+                   descomponer.dirsXYnull.put(seg[0], seg[1]);
+               }
+           }
+           
+          }
+         catch(FileNotFoundException e){
+          JOptionPane.showMessageDialog(null,"No se encontro el archivo Propiedades");
+       
+          } catch(IOException e){
+            JOptionPane.showMessageDialog(null, "Error de Lectura configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }  
+    }
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        escribirPropiedades();
+    }//GEN-LAST:event_formWindowClosing
+      
     /**
      * @param args the command line arguments
      */
@@ -835,19 +947,18 @@ public static void runing(){
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new form_geo().setVisible(true);
-             
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new form_geo().setVisible(true);
         });
     }
     
      
-
+//<editor-fold defaultstate="collapsed" desc="Variables declaration">
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Home;
     private javax.swing.JButton Ordenar;
+    private javax.swing.JButton btRowMas;
+    private javax.swing.JButton btRowMenos;
     private javax.swing.JButton btnCsv;
     private javax.swing.JButton btnExcel;
     private javax.swing.JButton btnGuardarZonas;
@@ -857,6 +968,7 @@ public static void runing(){
     private javax.swing.JButton btn_procesar;
     private javax.swing.JButton btn_zonal;
     private javax.swing.JButton btn_zonalHistoric;
+    private javax.swing.JCheckBox checkColumn2;
     private javax.swing.JLabel checklist_dirs;
     private javax.swing.JToggleButton importarDirs;
     private javax.swing.JButton jButton1;
@@ -881,6 +993,6 @@ public static void runing(){
     private javax.swing.JTextField txt_entrada;
     private javax.swing.JTextField txt_result;
     // End of variables declaration//GEN-END:variables
-
+//</editor-fold>
 }
  

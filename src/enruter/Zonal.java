@@ -8,8 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -386,14 +384,14 @@ class baseZonas{
      
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+     JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
             }//fin del if 
@@ -448,14 +446,14 @@ class baseZonas{
      
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
     }
     }
     }        
@@ -580,14 +578,14 @@ class historicZonas{//SUB CLASE PARA BUSCAR POR HISTORICO
      
 
     } catch (FileNotFoundException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
     } finally {
 
         try {
     myFile.close();
 
     } catch (IOException ex) {
-    Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
+    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");//Logger.getLogger(javaapplication6.ventana2.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
             }//fin del if 

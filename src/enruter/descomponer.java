@@ -87,7 +87,7 @@ public class descomponer {
         texto = texto.toLowerCase();//eliminar mayusculas   
         //////////////ESTANDARIZAR EXPRESIONES
     texto=texto.replace("ª","#");texto=texto.replace("º","#");texto=texto.replace("°","#");texto=texto.replace("*","");
-    texto=texto.replace("½"," ");texto=texto.replace("ï"," ");texto=texto.replace("¿"," ");
+    texto=texto.replace("½"," ");texto=texto.replace("ï"," ");texto=texto.replace("¿"," ");texto=texto.replace("\"","");
     texto=texto.replace("ak ","cr av");texto=texto.replace("ac ", "cl av");texto=texto.replace("1ra", "1");texto=texto.replace("3ra", "3 ");
     texto=texto.replace("carrera","cr");texto=texto.replace("karrera", "cr ");texto=texto.replace("cra ", "cr ");texto=texto.replace("kra", "cr ");
     texto=texto.replace("kr ", "cr ");
@@ -741,7 +741,7 @@ public String especialcase (String e){
                  e="Error:"+e; 
               }else{
               e="Rural: "+arrayTostring(segment);array[0]=510;
-              //valorNumerico(segment);
+              valorNumerico(segment);
               }
               break;    
           default:
@@ -1135,13 +1135,19 @@ public String codigo (){
     private void valorNumerico(String text[]){
         String acum="";
         String baseabc = "#abcdefghijklmnopqrstuvwxyz"; String[] str_arr;
-        int v=text.length,c=1;
+        int v=text.length,c=2;
         for(int cont=0;cont<v;cont++){
-                if(c<=8){   
-        for (String ch : str_arr=text[0].split("")) {array[c]=String.valueOf(baseabc.indexOf(ch)); acum=String.valueOf(baseabc.indexOf(ch))+acum;}
-              c++;  }
+                   
+          for (String ch : str_arr=text[0].split("")) {
+            if(("l".equals(isTipo(ch)))||("n".equals(isTipo(ch)))){   
+               if(c<8){   
+            array[c]=baseabc.indexOf(ch); acum=String.valueOf(baseabc.indexOf(ch))+acum;
+               c++;}
+             }
+          }
+              
         }
-        System.out.println(acum+"#"+c);
+        System.out.println(text[0]);
         
     }
   

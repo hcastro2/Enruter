@@ -772,27 +772,7 @@ public static void runing(){
         //      contexto =  System.getProperty("user.dir");
        }//JOptionPane.showMessageDialog(null, "E");
     }
-    private void llenarTable(){
-          int cont=0;
-             if(tablaDirecciones.getRowCount()!=0){}else{
-             
-           if(dirTest.listaDirecciones.size()<1){}else{
-           
-            DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
-            for (Object i: dirTest.listaDirecciones ) {
-            Object nuevo[]= {dirTest.listaDirecciones.get(cont).cadena,dirTest.listaDirecciones.get(cont).codigo,dirTest.listaDirecciones.get(cont).direccion,dirTest.listaDirecciones.get(cont).valorNum};
-            model2.addRow(nuevo);cont++;
-              }//JOptionPane.showMessageDialog(null,dirTest.listaDirecciones.get(1).X1);
-             }
-            }
-    }
-    private void limpiarTable(){
-        if(tablaDirecciones.getRowCount()==0){}else{
-        Collections.sort(listaDirecciones,new CompararIdZonas());//LINEA QUE ORDENA LAS DIRECCIONES POR CALLE Y CARRERA FALTA NUMERO
-        DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();// TODO add your handling code here:
-        model2.setRowCount(0);
-        }
-    }
+    
     private void llenarCombo(){
         String ciudDep, idCiud;
         if(ciudades.ciudades==null){ JOptionPane.showMessageDialog(null,"No Found Ciudades");}else{
@@ -807,7 +787,7 @@ public static void runing(){
         }
       }
     }
-//<editor-fold defaultstate="collapsed" desc="Generated Codigo objetos btn,lb,txt...">     
+//<editor-fold defaultstate="collapsed" desc="objetos: jPanel1,btnExcel,btnCsv,listciud btn,lb,txt...">     
     private void jPanel1ComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentHidden
        limpiarTable();
     }//GEN-LAST:event_jPanel1ComponentHidden
@@ -816,7 +796,27 @@ public static void runing(){
         limpiarTable();
         llenarTable();
     }//GEN-LAST:event_OrdenarActionPerformed
-
+        private void llenarTable(){
+          int cont=0;
+             if(tablaDirecciones.getRowCount()!=0){}else{
+             
+           if(dirTest.listaDirecciones.size()<1){}else{
+           
+            DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
+            for (Object i: dirTest.listaDirecciones ) {
+            Object nuevo[]= {dirTest.listaDirecciones.get(cont).cadena,dirTest.listaDirecciones.get(cont).codigo,dirTest.listaDirecciones.get(cont).direccion,dirTest.listaDirecciones.get(cont).valorNum};
+            model2.addRow(nuevo);cont++;
+              }//JOptionPane.showMessageDialog(null,dirTest.listaDirecciones.get(1).X1);
+             }
+            }
+    }
+        private void limpiarTable(){
+        if(tablaDirecciones.getRowCount()==0){}else{
+        Collections.sort(listaDirecciones,new CompararIdZonas());//LINEA QUE ORDENA LAS DIRECCIONES POR CALLE Y CARRERA FALTA NUMERO
+        DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();// TODO add your handling code here:
+        model2.setRowCount(0);
+        }
+    }
     private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
     // lbProcesando.setVisible(true);
         try {
@@ -825,6 +825,7 @@ public static void runing(){
         // ajustaricon();//muestra gif de procesando
          // ex.importExcel();// TODO add your handling code here:
           ex.importExcel();
+          llenarTable(descomponer.DirErrColect);//LLENA LA TABLA CON LAS DIRECCIONES NO LEIDAS
            descomponer.exportar_TextBasura(descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
@@ -849,7 +850,7 @@ public static void runing(){
           Excel ex = new Excel();
           lbProgreso.setVisible(true);
           ex.importCsv();lbProgreso.setVisible(false);
-          llenarTable(descomponer.DirErrColect);//JOptionPane.showMessageDialog(null, descomponer.DirErrColect);
+          llenarTable(descomponer.DirErrColect);//LLENA LA TABLA CON LAS DIRECCIONES NO LEIDAS
          descomponer.exportar_TextBasura(new String(descomponer.garbagColect.getBytes("ISO-8859-1"), "UTF-8"));// JOptionPane.showMessageDialog(null,descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
@@ -1040,8 +1041,6 @@ public static void runing(){
                txPathReports.setText(path);
                pathJar=path;
          }
-       
-       
     }//GEN-LAST:event_btnSelectPathActionPerformed
       
     /**

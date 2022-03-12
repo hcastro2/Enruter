@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,15 +32,13 @@ import jxl.*;
 import jxl.read.biff.BiffException;
 import jxl.write.*; 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+
 
  
 public class Excel{
@@ -66,85 +65,168 @@ public   void importExcel() throws IOException {
     File archivoElegido = fc.getSelectedFile();
                 //Mostrar el nombre del archvivo en un campo de texto
      String filename = archivoElegido.getAbsoluteFile().toString();//());// txtNombre.setText(archivoElegido.getName()); 
-    //String filename = "C:\\Users\\57321\\Documents\\bases\\base2.xls";
-        //List sheetData = new ArrayList();
-        FileInputStream fis = null;
-        
-        fis = new FileInputStream(filename);
-        HSSFWorkbook workbook = new HSSFWorkbook(fis);
-        HSSFSheet sheet = workbook.getSheetAt(0);
-        
-        Iterator  rows = sheet.rowIterator();
-        //Cell cell2 = sheet.getRow(0).getCell(5);
-        /* Escribimos un tí­tulo en negrita en la casilla A2(Columna 0 fila 1) */ 
-      /*  CellReference cellReference = new CellReference(2, 2); 
-        Row rowmatch = sheet.getRow(cellReference.getRow()); 
-        org.apache.poi.ss.usermodel.Cell cellda = rowmatch.getCell(cellReference.getCol());*/
-/////////////////CONTROL PREVIO DE LA SINTAXIS DEL ARCHIVO REVISANDO COLUMNA 2//////////////////////////
-            Object date[] = new Object[4]; 
-            date=   (Object[]) verificarArchivo(filename); //date[0]=Errores [1]=registros [2]= Numeros [3]=Ciud encontrados
-        if (((int)date[0]!=0)){JOptionPane.showMessageDialog(null,date[0] +" Registro Con Inconsistencias");return;}
-        
-/////////////////////////////////////////nuevo codigo/////////////////////////////
-        filas = sheet.getPhysicalNumberOfRows();
-        columnas = sheet.getRow(0).getPhysicalNumberOfCells();
-        Object tabla[][] = new Object [columnas+6][filas-1];int colcont=0,filcont=0,contTitulos=0;;
-        String encabezados[] = new String[columnas+6];
-        
-         while (rows.hasNext()) {//RECORRE POR FILAS Y COLUMNAS CADA CELDA
-             HSSFRow row = (HSSFRow) rows.next();
-                 Iterator cells = row.cellIterator();
-                 //List data = new ArrayList();
-            while (cells.hasNext()) { //PASA A LA SIGUIENTE LINEA
-                  
-                    HSSFCell cell = (HSSFCell) cells.next();
-                    column = cell.getColumnIndex(); fila = cell.getRowIndex();
-                    
-                   if ((cell.getRowIndex()==0)){ encabezados[contTitulos]=cell.toString();};contTitulos++;//PARA LLENAR ENCABEZADOS 
-             if(filcont>0){                                                
-                   if ((cell.getCellType()==1)){tabla[colcont][filcont-1]=cell.toString();//si es texto lo guarda como texto
-                   }else{
-                            tabla[colcont][filcont-1]=(int)cell.getNumericCellValue();}//si es numerico lo guarda como entero
+    String extencion = filename.substring(filename.lastIndexOf("."), filename.length())    ;         //"C:\\Users\\57321\\Documents\\bases\\base2.xls";
+            switch(extencion){
+                case ".xls":
+            //<editor-fold defaultstate="collapsed" desc="PROCESA EXTENCION XLS">    
+            FileInputStream fis = null;
+
+            fis = new FileInputStream(filename);
+            HSSFWorkbook workbook = new HSSFWorkbook(fis);
+            HSSFSheet sheet = workbook.getSheetAt(0);
+
+            Iterator  rows = sheet.rowIterator();
+            //Cell cell2 = sheet.getRow(0).getCell(5);
+            /* Escribimos un tí­tulo en negrita en la casilla A2(Columna 0 fila 1) */ 
+          /*  CellReference cellReference = new CellReference(2, 2); 
+            Row rowmatch = sheet.getRow(cellReference.getRow()); 
+            org.apache.poi.ss.usermodel.Cell cellda = rowmatch.getCell(cellReference.getCol());*/
+    /////////////////CONTROL PREVIO DE LA SINTAXIS DEL ARCHIVO REVISANDO COLUMNA 2//////////////////////////
+                Object date[] = new Object[4]; 
+                date=   (Object[]) verificarArchivo(filename); //date[0]=Errores [1]=registros [2]= Numeros [3]=Ciud encontrados
+            if (((int)date[0]!=0)){JOptionPane.showMessageDialog(null,date[0] +" Registro Con Inconsistencias");return;}
+
+    /////////////////////////////////////////nuevo codigo/////////////////////////////
+            filas = sheet.getPhysicalNumberOfRows();
+            columnas = sheet.getRow(0).getPhysicalNumberOfCells();
+            Object tabla[][] = new Object [columnas+6][filas-1];int colcont=0,filcont=0,contTitulos=0;;
+            String encabezados[] = new String[columnas+6];
+
+             while (rows.hasNext()) {//RECORRE POR FILAS Y COLUMNAS CADA CELDA
+                 HSSFRow row = (HSSFRow) rows.next();
+                     Iterator cells = row.cellIterator();
+                     //List data = new ArrayList();
+                while (cells.hasNext()) { //PASA A LA SIGUIENTE LINEA
+
+                        HSSFCell cell = (HSSFCell) cells.next();
+                        column = cell.getColumnIndex(); fila = cell.getRowIndex();
+
+                       if ((cell.getRowIndex()==0)){ encabezados[contTitulos]=cell.toString();};contTitulos++;//PARA LLENAR ENCABEZADOS 
+                 if(filcont>0){                                                
+                       if ((cell.getCellType()==1)){tabla[colcont][filcont-1]=cell.toString();//si es texto lo guarda como texto
+                       }else{
+                                tabla[colcont][filcont-1]=(int)cell.getNumericCellValue();}//si es numerico lo guarda como entero
+
+                       colcont++;
+                       // JOptionPane.showMessageDialog(null, cell.getCellType());
+                         if ((column==0)&&(filcont>0)){//aqui aunque recorre toda la matriz solo ejecuta la accion sobre la columna 0 fila 1 ignora encabezados
+                                d = new descomponer();String cadena=d.texting(cell.toString());String codigo=d.codigo();//String.valueOf(idciudad)+
+                             Double valor=d.valor;//zn = new Zonal();   zn.calcZona(codigo);
+                            //JOptionPane.showMessageDialog(null,cell+"#\n"+cadena+"#\n"+codigo+"#"+zn.getZona());
+                               idciudad= (int)row.getCell(1).getNumericCellValue();
+                                tabla[columnas][filcont-1]=idciudad+codigo;
+                                tabla[columnas+1][filcont-1]=cadena;
+                                tabla[columnas+2][filcont-1]=valor;
+                                tabla[columnas+3][filcont-1]=filcont;
+                               }
+
+                }
+                }//fin while
+                  filcont++; colcont=0;  
+
+             }  // fin while principal
+            encabezados[columnas]="Codigo";//LLENA ENCABEZADO tabla[columnas][0]="Codigo";
+            encabezados[columnas+1]="Cadena";//LLENA ENCABEZADO  tabla[columnas+1][0]="Cadena";
+            encabezados[columnas+2]="ValorNumerico";//LLENA ENCABEZADO-Valor numerico para ordenar tabla[columnas+2][0]="ValorNumerico";
+            encabezados[columnas+3]="OrdenOriginal";//LLENA ENCABEZADO-orden original  tabla[columnas+3][0]="OrdenOriginal";
+            encabezados[columnas+4]="Zona";//LLENA ENCABEZADO-ESPACIO RESERVADO PARA ZONIFICAR  tabla[columnas+4][0]="Zona";
+            encabezados[columnas+5]="NewOrden";// 
+
+
+             ///////////////////////LINEA PARA EMPEZAR A ZONIFICAR LA BASE//////////////////////////////////
+             for (int i=0;i<filas-1;i++){
+                 //JOptionPane.showMessageDialog(null,tabla[columnas][i]);
+            zn = new Zonal(); zn.calcZona((String) tabla[columnas][i]);
+            String result = zn.getZona();tabla[columnas+4][i]=result;}
+             ////////////////////////////////////////FIN DE LA ZONIFICACION POR CALCULO////////////////  
+
+            exportExcel(tabla,encabezados);//EXPORTA A EXCEL INFORME
+
+            System.gc();tabla=null;zn=null;bzn=null;//CONTROL DE MEMORIA 
+
+             JOptionPane.showMessageDialog(null,"Proceso Finalizado");
+         //</editor-fold>   
+                   break;
+                case ".xlsx":
+            //<editor-fold defaultstate="collapsed" desc="PROCESA EXTENCION XLSX">    
+            FileInputStream fisx = null;
+
+            fisx = new FileInputStream(filename);
+            XSSFWorkbook worbookx = new XSSFWorkbook(fisx);
+            XSSFSheet sheetx = worbookx.getSheetAt(0);
+
+            Iterator<Row> rowsx = sheetx.iterator();
+    ///////////////////////CONTROL PREVIO PARA VERIFICAR CLUMNA 2 DEJAR ESPACIO///////////////
+    /////////////////////////////////////////////////////////////////////////////////////////        
+            filas = sheetx.getPhysicalNumberOfRows();
+            columnas = sheetx.getRow(0).getPhysicalNumberOfCells();
+            
+            Object tablax[][] = new Object [columnas+6][filas-1];
+            int colcontx=0,filcontx=0,contTitulosx=0;;
+            String encabezadosx[] = new String[columnas+6];
+
+             while (rowsx.hasNext()) {//RECORRE POR FILAS Y COLUMNAS CADA CELDA
+                 XSSFRow row = (XSSFRow) rowsx.next();
+                     Iterator cells = row.cellIterator();
+                     //List data = new ArrayList();
+                while (cells.hasNext()) { //PASA A LA SIGUIENTE LINEA
+
+                        XSSFCell cell = (XSSFCell) cells.next();
+                        column = cell.getColumnIndex(); fila = cell.getRowIndex();
+
+                       if ((cell.getRowIndex()==0)){ encabezadosx[contTitulosx]=cell.toString();};contTitulosx++;//PARA LLENAR ENCABEZADOS 
+                 if(filcontx>0){                                                
+                       if ((cell.getCellType()==1)){tablax[colcontx][filcontx-1]=cell.toString();//si es texto lo guarda como texto
+                       }else{
+                                tablax[colcontx][filcontx-1]=(int)cell.getNumericCellValue();}//si es numerico lo guarda como entero
+
+                       colcontx++;
+                       // JOptionPane.showMessageDialog(null, cell.getCellType());
+                         if ((column==0)&&(filcontx>0)){//aqui aunque recorre toda la matriz solo ejecuta la accion sobre la columna 0 fila 1 ignora encabezados
+                                d = new descomponer();String cadena=d.texting(cell.toString());String codigo=d.codigo();//String.valueOf(idciudad)+
+                             Double valor=d.valor;//zn = new Zonal();   zn.calcZona(codigo);
+                            //JOptionPane.showMessageDialog(null,cell+"#\n"+cadena+"#\n"+codigo+"#"+zn.getZona());
+                               idciudad= (int)row.getCell(1).getNumericCellValue();
+                                tablax[columnas][filcontx-1]=idciudad+codigo;
+                                tablax[columnas+1][filcontx-1]=cadena;
+                                tablax[columnas+2][filcontx-1]=valor;
+                                tablax[columnas+3][filcontx-1]=filcontx;
+                               }
+
+                }
+                }//fin while
+                  filcontx++; colcontx=0;  
+
+             }  // fin while principal
+            encabezadosx[columnas]="Codigo";//LLENA ENCABEZADO tabla[columnas][0]="Codigo";
+            encabezadosx[columnas+1]="Cadena";//LLENA ENCABEZADO  tabla[columnas+1][0]="Cadena";
+            encabezadosx[columnas+2]="ValorNumerico";//LLENA ENCABEZADO-Valor numerico para ordenar tabla[columnas+2][0]="ValorNumerico";
+            encabezadosx[columnas+3]="OrdenOriginal";//LLENA ENCABEZADO-orden original  tabla[columnas+3][0]="OrdenOriginal";
+            encabezadosx[columnas+4]="Zona";//LLENA ENCABEZADO-ESPACIO RESERVADO PARA ZONIFICAR  tabla[columnas+4][0]="Zona";
+            encabezadosx[columnas+5]="NewOrden";// 
+
+
+             ///////////////////////LINEA PARA EMPEZAR A ZONIFICAR LA BASE//////////////////////////////////
+             for (int i=0;i<filas-1;i++){
+                 //JOptionPane.showMessageDialog(null,tabla[columnas][i]);
+            zn = new Zonal(); zn.calcZona((String) tablax[columnas][i]);
+            String result = zn.getZona();tablax[columnas+4][i]=result;}
+             ////////////////////////////////////////FIN DE LA ZONIFICACION POR CALCULO////////////////  
+
+            exportExcelXlsx(tablax,encabezadosx);//EXPORTA A EXCEL INFORME
+
+            System.gc();tablax=null;zn=null;bzn=null;//CONTROL DE MEMORIA 
+            
+            
+             JOptionPane.showMessageDialog(null,"Proceso Finalizado");        
+            //</editor-fold>         
                    
-                   colcont++;
-                   // JOptionPane.showMessageDialog(null, cell.getCellType());
-                     if ((column==0)&&(filcont>0)){//aqui aunque recorre toda la matriz solo ejecuta la accion sobre la columna 0 fila 1 ignora encabezados
-                            d = new descomponer();String cadena=d.texting(cell.toString());String codigo=d.codigo();//String.valueOf(idciudad)+
-                         Double valor=d.valor;//zn = new Zonal();   zn.calcZona(codigo);
-                        //JOptionPane.showMessageDialog(null,cell+"#\n"+cadena+"#\n"+codigo+"#"+zn.getZona());
-                           idciudad= (int)row.getCell(1).getNumericCellValue();
-                            tabla[columnas][filcont-1]=idciudad+codigo;
-                            tabla[columnas+1][filcont-1]=cadena;
-                            tabla[columnas+2][filcont-1]=valor;
-                            tabla[columnas+3][filcont-1]=filcont;
-                           }
-                     
+                   break;
+                default:
+                    JOptionPane.showMessageDialog(null,"Extencion no Valida");
+                    
+                   break;    
             }
-            }//fin while
-              filcont++; colcont=0;  
-              
-         }  // fin while principal
-        encabezados[columnas]="Codigo";//LLENA ENCABEZADO tabla[columnas][0]="Codigo";
-        encabezados[columnas+1]="Cadena";//LLENA ENCABEZADO  tabla[columnas+1][0]="Cadena";
-        encabezados[columnas+2]="ValorNumerico";//LLENA ENCABEZADO-Valor numerico para ordenar tabla[columnas+2][0]="ValorNumerico";
-        encabezados[columnas+3]="OrdenOriginal";//LLENA ENCABEZADO-orden original  tabla[columnas+3][0]="OrdenOriginal";
-        encabezados[columnas+4]="Zona";//LLENA ENCABEZADO-ESPACIO RESERVADO PARA ZONIFICAR  tabla[columnas+4][0]="Zona";
-        encabezados[columnas+5]="NewOrden";// 
-         
-         
-         ///////////////////////LINEA PARA EMPEZAR A ZONIFICAR LA BASE//////////////////////////////////
-         for (int i=0;i<filas-1;i++){
-             //JOptionPane.showMessageDialog(null,tabla[columnas][i]);
-        zn = new Zonal(); zn.calcZona((String) tabla[columnas][i]);
-        String result = zn.getZona();tabla[columnas+4][i]=result;}
-         ////////////////////////////////////////FIN DE LA ZONIFICACION POR CALCULO////////////////  
-       
-        exportExcel(tabla,encabezados);//EXPORTA A EXCEL INFORME
-        
-        System.gc();tabla=null;zn=null;bzn=null;//CONTROL DE MEMORIA 
-        
-         JOptionPane.showMessageDialog(null,"Proceso Finalizado");
-         
        } catch (FileNotFoundException ex) {
          JOptionPane.showMessageDialog(null,ex.getMessage());
       } catch (BiffException ex) {
@@ -288,7 +370,76 @@ public  void exportExcel(Object data[][], Object cabecera[]) throws BiffExceptio
     {
         JOptionPane.showMessageDialog(null,"Error al escribir el fichero. Error: "+ex);
     }
+}//exporta en xls libreria jxl
+public  void exportExcelXlsx(Object data[][], Object cabecera[]) throws BiffException{
+    int columnas=data.length,filas=data[0].length,matchfil;
+    List  lista =  ordenar(data);// ORDENA LA LISTA YA PROCESADA
+     
+      String strPath = form_geo.pathJar;//
+      String nombreArchivo="reporte.xlsx";
+      XSSFWorkbook libro= new XSSFWorkbook();
+      XSSFSheet  sheet = libro.createSheet("hoja1");
+      ////////////ENCABEZADOS///////////////////////////////////
+      XSSFRow titulos=sheet.createRow(0);//se crea l primera fila
+      for(int cont=0;cont<columnas;cont++){    
+         XSSFCell cell= titulos.createCell(cont);//se crea las celdas para la cabecera, junto con la posición
+         cell.setCellValue(cabecera[cont].toString());//se añade el contenido
+        }
+      /////////////////////RECORRER LA LISTA///////////////////////////////////////////////
+      int contlist=0,fil=1; //match = (int)data[colmatch][fil];//AUN NO
+        while(contlist<listaOrden.size()) {
+            matchfil=(int)listaOrden.get(contlist);
+            //if (columnas-1==colr){data[colr][matchfil]=contlist+1;}
+           // recorrer la matriz
+          for (int i = 0; i < filas; i++) {
+              
+              if((int)data[5][i]==matchfil){
+              data[7][i]=contlist+1;//JOptionPane.showMessageDialog(null, String.valueOf(data[5][i]));
+              XSSFRow row=sheet.createRow(fil);//se crea l primera fila 
+                   //llenamos los datos de las celdas
+                    for(int cont=0;cont<columnas;cont++){    
+                     XSSFCell cell= row.createCell(cont);//se crea las celdas para la cabecera, junto con la posición
+                     cell.setCellValue(String.valueOf(data[cont][i]));//se añade el contenido
+                    }
+              
+              }
+                
+          }  
+            
+          
+         contlist++;fil++;   
+        }//fin while
+      //generar los datos para el documento
+      /*  for (int i = 1; i <= filas; i++) {
+                XSSFRow row=sheet.createRow(i);//se crea las filas
+                for (int j = 0; j <cabecera.length; j++) {
+                        if (i==0) {//para la cabecera
+                                XSSFCell cell= row.createCell(j);//se crea las celdas para la contenido, junto con la posición
+                               // cell.setCellValue(String.valueOf(data[j][i-1])); //se añade el contenido
+                               
+                        }				
+                }
+        }*/
+      
+     File file;
+		file = new File(strPath+nombreArchivo);
+		try (FileOutputStream fileOuS = new FileOutputStream(file)){						
+			if (file.exists()) {// si el archivo existe se elimina
+				file.delete();
+				System.out.println("Archivo eliminado");
+			}
+			libro.write(fileOuS);
+			fileOuS.flush();
+			fileOuS.close();
+			System.out.println("Archivo Creado"); 
+    ///////////////////////////INCIO DE EXCEPCIONES  
+    } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
 }
+
 public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo) throws BiffException {
     int columnas=cabecera.length,filas=data.length;
     try

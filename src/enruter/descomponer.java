@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -196,8 +195,11 @@ String c1="",c2 = "";
        if (segmentos[0].contains("calle")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("diag")){result=corregirText(texto,segmentos);}
       if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))){result=corregirText(texto,segmentos);}
-     //JOptionPane.showMessageDialog(null,buscarH("ca", segmentos));
-      if((buscarH("ca", segmentos)>-1)&&(texto.contains("mz"))){
+         Boolean controlXY=  dirsXYnull.containsKey(segmentos[0]);    //CONTROL PERSONALIZADO CON AYUDA DE CORRECCIONES DEL USUARIO
+         if((controlXY==true)&&(valor!=null)){
+         String valor = dirsXYnull.get(segmentos[0].toString());result=texto.replaceFirst(segmentos[0]+".", valor+".");
+         }
+         if((buscarH("ca", segmentos)>-1)&&(texto.contains("mz"))){
          segmentos[buscarH("ca", segmentos)]="cs";   result=arrayTostring(segmentos) ;}
       if("".equals(result)){result=texto;}//si no encuentra correccion devuelve el texto completo
        return result;
@@ -739,6 +741,7 @@ public String especialcase (String e){
                  e="Error:"+e; 
               }else{
               e="Rural: "+arrayTostring(segment);array[0]=510;
+              //valorNumerico(segment);
               }
               break;    
           default:
@@ -1129,14 +1132,26 @@ public String codigo (){
       // result=numero;//if(contN==2){result=numero;}
         return retorno;
     }
-   
+    private void valorNumerico(String text[]){
+        String acum="";
+        String baseabc = "#abcdefghijklmnopqrstuvwxyz"; String[] str_arr;
+        int v=text.length,c=1;
+        for(int cont=0;cont<v;cont++){
+                if(c<=8){   
+        for (String ch : str_arr=text[0].split("")) {array[c]=String.valueOf(baseabc.indexOf(ch)); acum=String.valueOf(baseabc.indexOf(ch))+acum;}
+              c++;  }
+        }
+        System.out.println(acum+"#"+c);
+        
+    }
   
  // </editor-fold>   
 static void exportar_TextBasura(String valor) throws IOException {
 
      try{
-         String strPath = System.getProperty("user.home");
-        String f = strPath+"\\Documents\\TextBasura.txt";
+        // String strPath = System.getProperty("user.home");
+         String strPath = form_geo.pathJar;//
+        String f = strPath+"TextBasura.txt";
         File file = new File(f); 
      //Writer escribe = null;//FileOutputStream fis = new FileOutputStream(f);
      PrintWriter writer = new PrintWriter(f, "UTF-8");
@@ -1397,8 +1412,9 @@ public void procesarLista( ) throws IOException{
  public void exportar_datos(String valor) throws IOException {
 
      try{
-         String strPath = System.getProperty("user.home");
-        String f = strPath+"\\Documents\\result.txt";
+         //String strPath = System.getProperty("user.home");
+         String strPath = form_geo.pathJar;//
+        String f = strPath+"\\result.txt";
         File file = new File(f); 
     //FileOutputStream fis = new FileOutputStream(f);
     if (!file.exists()) {

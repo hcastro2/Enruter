@@ -8,6 +8,7 @@ import static enruter.dirTest.listaDirecciones;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -19,6 +20,8 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
@@ -30,11 +33,11 @@ import javax.swing.table.TableModel;
  */
 public class form_geo extends javax.swing.JFrame implements ActionListener {
   String texto;
-  static String datoGlobal;
+  static String datoGlobal;public static String pathJar;
     public form_geo() {
         initComponents();
-        leerPropieties();
-      lbProgreso.setVisible(false);//  ajustaricon();
+        leerPropieties();obtenerRuta();leerPropietiesMain();
+        lbProgreso.setVisible(false);//  ajustaricon();
       this.getContentPane().setBackground(Color.white);
       this.Home.setBackground(Color.white);
         btn_procesar.addActionListener(this);
@@ -60,7 +63,18 @@ public static void runing(){
            
           if (estado==null){   ;return;}  
             if (estado[0]=="Editar"){
-       
+                //tabla1.setModel(new DefaultTableModel(){ @Override public boolean isCellEditable(int row, int column) { if (column == x) { return true; } else return false; } }); 
+                //Class<?> col_clas = tabla1.getColumnClass(1);
+                //tabla1.getDefaultEditor(col_clas);JOptionPane.showMessageDialog(null, tabla1.getDefaultEditor(col_clas));
+               
+               // JOptionPane.showMessageDialog(null, tabla1.getCellEditor());
+                //tabla1.setCellEditor(new DefaultCellEditor (checkColumn2));
+               // tabla1.setEditingColumn(2);
+               // tabla1.setCellSelectionEnabled( true );
+               
+              //  tabla1.setDefaultEditor(col_clas, null);
+                
+          
             }
              
          }
@@ -140,6 +154,10 @@ public static void runing(){
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDirecciones = new javax.swing.JTable();
         Ordenar = new javax.swing.JButton();
+        config = new javax.swing.JPanel();
+        txPathReports = new javax.swing.JTextField();
+        btnSelectPath = new javax.swing.JButton();
+        lbInfopath = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -344,7 +362,7 @@ public static void runing(){
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(246, Short.MAX_VALUE))
+                .addContainerGap(237, Short.MAX_VALUE))
         );
         HomeLayout.setVerticalGroup(
             HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -447,7 +465,7 @@ public static void runing(){
         panelZonas.setLayout(panelZonasLayout);
         panelZonasLayout.setHorizontalGroup(
             panelZonasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
             .addGroup(panelZonasLayout.createSequentialGroup()
                 .addGap(41, 41, 41)
                 .addComponent(btnGuardarZonas, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -526,7 +544,7 @@ public static void runing(){
                         .addGap(29, 29, 29))
                     .addGroup(panelHistoricLayout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 645, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(21, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         panelHistoricLayout.setVerticalGroup(
             panelHistoricLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -593,6 +611,42 @@ public static void runing(){
 
         jTabbedPane1.addTab("Direcciones", jPanel1);
 
+        btnSelectPath.setText("Seleccionar Ruta");
+        btnSelectPath.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectPathActionPerformed(evt);
+            }
+        });
+
+        lbInfopath.setText("Path Reportes");
+
+        javax.swing.GroupLayout configLayout = new javax.swing.GroupLayout(config);
+        config.setLayout(configLayout);
+        configLayout.setHorizontalGroup(
+            configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(configLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lbInfopath, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                    .addComponent(txPathReports))
+                .addGap(18, 18, 18)
+                .addComponent(btnSelectPath)
+                .addContainerGap(117, Short.MAX_VALUE))
+        );
+        configLayout.setVerticalGroup(
+            configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(configLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lbInfopath, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txPathReports, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelectPath))
+                .addContainerGap(270, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Configuracion", null, config, "Seleccione Donde guardar sus archivos");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -612,7 +666,8 @@ public static void runing(){
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
+
+//<editor-fold defaultstate="collapsed" desc="Generated Codigo objetos btn,lb,txt...formWindowOpened">    
     private void btn_procesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_procesarActionPerformed
         // TODO add your handling code here:
     // try {
@@ -650,6 +705,7 @@ public static void runing(){
     }//GEN-LAST:event_btn_zonalActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        
         txt_entrada.requestFocus();
         this.checklist_dirs.setText(ListaDirecciones.checklist);//
         if (baseZonas.zonasCargadas==true){this.lb_zonas.setText("Zonas cargadas");}else{this.lb_zonas.setText("Zonas Null");}//this.lb_zonas.setText();
@@ -700,7 +756,22 @@ public static void runing(){
              JOptionPane.showMessageDialog(null, "Error: "+e);
     }//tablaDirecciones.removeRowSelectionInterval(0, tablaDirecciones.getRowCount());
     }//GEN-LAST:event_jTabbedPane1MouseClicked
-
+//</editor-fold>
+    private void obtenerRuta(){////LEER ARCHIVO MAIN DE CONFIGURACION INCIAL SINO POR DEFECTO//////////////////////////////////////////////
+       //String contexto;
+       if ((pathJar==null)||("".equals(pathJar))){
+                File f = new File(".");
+                String path= f.getAbsolutePath().replace(".", "");//obtengo ruta del path
+                lbInfopath.setText("Ruta de Informes:");
+                txPathReports.setText(path);
+                pathJar=txPathReports.getText();
+       }else{
+           txPathReports.setText(pathJar);
+        //si no esta vacio ni nulo mantiene el dato en la variable global path
+        //contexto=  pathJar;
+        //      contexto =  System.getProperty("user.dir");
+       }//JOptionPane.showMessageDialog(null, "E");
+    }
     private void llenarTable(){
           int cont=0;
              if(tablaDirecciones.getRowCount()!=0){}else{
@@ -736,7 +807,7 @@ public static void runing(){
         }
       }
     }
-    
+//<editor-fold defaultstate="collapsed" desc="Generated Codigo objetos btn,lb,txt...">     
     private void jPanel1ComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentHidden
        limpiarTable();
     }//GEN-LAST:event_jPanel1ComponentHidden
@@ -784,7 +855,7 @@ public static void runing(){
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
     }//GEN-LAST:event_btnCsvActionPerformed
-   
+    //</editor-fold > 
      //<editor-fold defaultstate="collapsed" desc="FUNCIONES Y CODIGOS JTABLE NOCORREGIDOS">
    
     private void llenarTable(String matrizDoComas){
@@ -868,7 +939,7 @@ public static void runing(){
   
    //</editor-fold> 
     
-              
+//<editor-fold defaultstate="collapsed" desc="Generated Codigo archivos propiedades">               
     private void escribirPropiedades(){
         int cont=descomponer.dirsXYnull.size();String llavesXY="";
         try{
@@ -891,12 +962,13 @@ public static void runing(){
         }
     }
     private void leerPropieties() {
-        
-        
+        File f = new File(".");
+        String path= f.getAbsolutePath().replace(".", "");//obtengo ruta del path
+        //JOptionPane.showMessageDialog(null, path);
         try{
            String llavesXY="";
            Properties propiedades = new Properties();
-           propiedades.load(new FileReader("propiedades.properties"));
+           propiedades.load(new FileReader(path+"propiedades.properties"));
            llavesXY = propiedades.getProperty("dirsXY");
            String texto[]=  llavesXY.split(";");
            if(texto.length>0){
@@ -914,14 +986,71 @@ public static void runing(){
             JOptionPane.showMessageDialog(null, "Error de Lectura configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }  
     }
+    private void leerPropietiesMain() {
+        String path = System.getProperty("user.dir");
+        
+        try{
+              
+           String pathReports;
+           Properties propiedades = new Properties();
+           propiedades.load(new FileReader(path+"\\main.properties"));
+           pathReports = propiedades.getProperty("pathReports");
+              if(("".equals(pathReports))||(pathReports==null)){
+                  pathJar=path;//txPathReports.setText(pathJar);
+              }else{
+               pathJar=pathReports;
+                //txPathReports.setText(pathJar);
+               }
+              txPathReports.setText(pathJar);
+          }
+         catch(FileNotFoundException e){
+          JOptionPane.showMessageDialog(null,"No se encontro el archivo main");
+       
+          } catch(IOException e){
+            JOptionPane.showMessageDialog(null, "Error de Lectura configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }  
+    }
+    private void escribirPropiedadesMainPath(String path){
+        
+        try{
+            Properties p = new Properties();  
+            FileOutputStream fOutputStream = new FileOutputStream("main.properties"); 
+            p.setProperty("pathReports", path);p.store(fOutputStream, "");
+            fOutputStream.close();
+        } catch(IOException e){
+            JOptionPane.showMessageDialog(null, "Error guardando configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+//</editor-fold >     
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         escribirPropiedades();
+        escribirPropiedadesMainPath(txPathReports.getText());
     }//GEN-LAST:event_formWindowClosing
+
+    private void btnSelectPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectPathActionPerformed
+        // TODO add your handling code here:
+        String path;
+         ///////////////////////////////////////////////////////////////////////////////////////////////
+         JFileChooser fc = new JFileChooser();
+         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+         int respuesta = fc.showOpenDialog(this);
+         if (respuesta == JFileChooser.APPROVE_OPTION) {
+             path= fc.getSelectedFile().getAbsolutePath()+"\\";
+               txPathReports.setText(path);
+               pathJar=path;
+         }
+       
+       
+    }//GEN-LAST:event_btnSelectPathActionPerformed
       
     /**
      * @param args the command line arguments
      */
+  
+    
+    
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -962,6 +1091,7 @@ public static void runing(){
     private javax.swing.JButton btnCsv;
     private javax.swing.JButton btnExcel;
     private javax.swing.JButton btnGuardarZonas;
+    private javax.swing.JButton btnSelectPath;
     private javax.swing.JButton btn_limpiar;
     private javax.swing.JButton btn_list;
     private javax.swing.JButton btn_open1;
@@ -970,6 +1100,7 @@ public static void runing(){
     private javax.swing.JButton btn_zonalHistoric;
     private javax.swing.JCheckBox checkColumn2;
     private javax.swing.JLabel checklist_dirs;
+    private javax.swing.JPanel config;
     private javax.swing.JToggleButton importarDirs;
     private javax.swing.JButton jButton1;
     private javax.swing.JLayeredPane jLayeredPane1;
@@ -979,6 +1110,7 @@ public static void runing(){
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton jbGuardar;
+    private javax.swing.JLabel lbInfopath;
     private javax.swing.JLabel lbProgreso;
     private javax.swing.JLabel lb_codigo;
     private javax.swing.JLabel lb_zona;
@@ -990,6 +1122,7 @@ public static void runing(){
     private javax.swing.JTable tabla1;
     private javax.swing.JTable tablaDirecciones;
     private javax.swing.JTable tablaZonas;
+    private javax.swing.JTextField txPathReports;
     private javax.swing.JTextField txt_entrada;
     private javax.swing.JTextField txt_result;
     // End of variables declaration//GEN-END:variables

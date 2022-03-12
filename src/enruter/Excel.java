@@ -1,9 +1,6 @@
 
 package enruter;
 
-
-
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,7 +171,7 @@ public  void importCsv() throws IOException {
     if (respuesta == JFileChooser.APPROVE_OPTION) {}else{
       JOptionPane.showMessageDialog(null,"Proceso Cancelado");  return;
      }
-               
+     //pruebas p = new pruebas();p.setVisible(true);   no repinta el formulario       
     File archivoElegido = fc.getSelectedFile();
                 //Mostrar el nombre del archvivo en un campo de texto
      String filename = archivoElegido.getAbsoluteFile().toString();
@@ -216,7 +213,7 @@ public  void importCsv() throws IOException {
                  a=valores.getTexto();b= valores.getCodigo();c=valores.getCadena();
                  cont++;
                  exportarCsv(a+";"+b+";"+c+";"+cont);
-                 //JOptionPane.showMessageDialog(null,valores.getCadena());
+                    //JOptionPane.showMessageDialog(null,valores.getCadena());
              }
          }
          
@@ -244,9 +241,9 @@ public  void exportExcel(Object data[][], Object cabecera[]) throws BiffExceptio
     {
     List  lista =  ordenar(data);// ORDENA LA LISTA YA PROCESADA
      
-     
-      String strPath = System.getProperty("user.home");//"C:\\Users\\57321\\Documents\\";
-      WritableWorkbook workbook = Workbook.createWorkbook(new File(strPath+"\\Documents\\reporte.xls"));
+      String strPath = form_geo.pathJar;//
+      //String strPath = System.getProperty("user.home");//"C:\\Users\\57321\\Documents\\";
+      WritableWorkbook workbook = Workbook.createWorkbook(new File(strPath+"reporte.xls"));
       
       WritableSheet sheet = workbook.createSheet("Reporte", 0);
       
@@ -298,9 +295,9 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
     {
     
      
-     
-      String strPath = System.getProperty("user.dir");//"C:\\Users\\57321\\Documents\\";
-      WritableWorkbook workbook = Workbook.createWorkbook(new File(strPath+"\\Documents\\"+nomArchivo+".xls"));
+     String strPath = form_geo.pathJar;//
+     // String strPath = System.getProperty("user.dir");//"C:\\Users\\57321\\Documents\\";
+      WritableWorkbook workbook = Workbook.createWorkbook(new File(strPath+nomArchivo+".xls"));
       
       WritableSheet sheet = workbook.createSheet("Reporte", 0);
       
@@ -347,8 +344,8 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
 
      try{
          
-        String strPath = System.getProperty("user.home");  
-        String f = strPath+"\\Documents\\result.csv";
+        String strPath = form_geo.pathJar;//System.getProperty("user.home");  
+        String f = strPath+"result.csv";
         File file = new File(f); 
     //FileOutputStream fis = new FileOutputStream(f);
     if (!file.exists()) {

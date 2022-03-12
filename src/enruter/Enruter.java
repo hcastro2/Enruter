@@ -16,11 +16,13 @@ import javax.swing.JOptionPane;
  */
 public class Enruter {
 public static String nomenclatura;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {//clase exclusiva para I/O entrada salida de datos del usuario y hacer pruebas
         // TODO code application logic here
+        
         ListaDirecciones l = new ListaDirecciones();
         baseZonas z = new baseZonas();
         ciudades c = new ciudades();
@@ -29,9 +31,7 @@ public static String nomenclatura;
                     } catch (IOException ex) {
                         Logger.getLogger(descomponer.class.getName()).log(Level.SEVERE, null, ex);
                     }
-   // nomenclatura=(JOptionPane.showInputDialog(null, "Ingrese Expresion"));
-    
-  //JOptionPane.showMessageDialog(null,d.texting(nomenclatura)); 
+   
   
      form_geo fr = new form_geo(); 
         

@@ -15,18 +15,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import org.apache.poi.ss.formula.functions.T;
 /**
  *
  * @author 57321
@@ -42,8 +45,10 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
       this.Home.setBackground(Color.white);
         btn_procesar.addActionListener(this);
         btn_open1.addActionListener(this);
-        anadeListenerAlModelo(tabla1);
+        anadeListenerAlModelo(tabla1);anadeListenerTablaZonas(tablaZonas);
         checkColumn2.addActionListener(this);
+        tablaZonas.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(generateBox()));
+        tablaZonas.setColumnSelectionAllowed(true);
     }
 public static void runing(){
    
@@ -445,11 +450,11 @@ public static void runing(){
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nombre Zona", "Sector:Norte-sur-este-oeste", "Inicio Eje calles", "Fin Eje Calles", "Inicio Eje Carreras", "Fin Eje Carreras", "A", "B"
+                "Nombre Zona", "Sector:Norte-sur-este-oeste", "Inicio Eje Calles", "Fin Eje Calles", "Inicio Eje Carreras", "Fin Eje Carreras", "A", "B"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, false, true, true, true, true, false, false
+                true, true, true, true, true, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -462,6 +467,11 @@ public static void runing(){
         }
 
         btnGuardarZonas.setText("Guardar Zonas");
+        btnGuardarZonas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarZonasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelZonasLayout = new javax.swing.GroupLayout(panelZonas);
         panelZonas.setLayout(panelZonasLayout);
@@ -469,18 +479,17 @@ public static void runing(){
             panelZonasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
             .addGroup(panelZonasLayout.createSequentialGroup()
-                .addGap(41, 41, 41)
-                .addComponent(btnGuardarZonas, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60)
+                .addComponent(btnGuardarZonas, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelZonasLayout.setVerticalGroup(
             panelZonasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelZonasLayout.createSequentialGroup()
-                .addContainerGap(23, Short.MAX_VALUE)
-                .addComponent(btnGuardarZonas, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(btnGuardarZonas)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Zonas", panelZonas);
@@ -912,17 +921,11 @@ public static void runing(){
       }
       public void actualizartabla1(TableModelEvent evento){
            if (evento.getType() == TableModelEvent.UPDATE) {
-
             // Se obtiene el modelo de la tabla y la fila/columna que han cambiado.
             TableModel modelo = ((TableModel) (evento.getSource()));
             int fila = evento.getFirstRow();
             int columna = evento.getColumn();
 
-            // Los cambios en la ultima fila y columna se ignoran.
-            // Este return es necesario porque cuando nuestro codigo modifique
-            // los valores de las sumas en esta fila y columna, saltara nuevamente
-            // el evento, metiendonos en un bucle recursivo de llamadas a este
-            // metodo.
             if (fila == 2 || columna == 3) {
                 return;
             }
@@ -1044,14 +1047,151 @@ public static void runing(){
                pathJar=path;
          }
     }//GEN-LAST:event_btnSelectPathActionPerformed
-      
-    /**
+/**
      * @param args the command line arguments
      */
-  
     
+//<editor-fold defaultstate="collapsed" desc="CODIGOS JTABLE ZONAS">     
+    private void btnGuardarZonasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarZonasActionPerformed
+        String acumZonas=""; // TODO add your handling code here:
+          int filas = tablaZonas.getRowCount();int conta=0,contrr=0;//JOptionPane.showMessageDialog(null, );
+        //  primero verificar inconsistencias
+        for (int cont=0; cont<filas;cont++){
+          Object control= tablaZonas.getValueAt(cont,0);
+           if (control!=null){//determina las celdas no vacias de la tabla
+               String control2 =String.valueOf(tablaZonas.getValueAt(cont,6));
+              if((control2.contains("null"))||(control2.contains("?"))){ 
+                  contrr++;//JOptionPane.showMessageDialog(null,"linea Inconsistente" );
+                       }else{  
+                  acumZonas=acumZonas+control2+"\n";conta++;//aqui debe guardar
+                  }
+            
+           }
+        }
+        JOptionPane.showMessageDialog(null,conta +" Elementos Guardados\nLineas Con inconsistencias "+ contrr+"\n"+acumZonas );
+      try {
+          tools.exportarXarchivo(acumZonas,"zonasCreadas");
+      } catch (IOException ex) {
+         JOptionPane.showMessageDialog(null,"Error al Exportar");
+      }
+    }//GEN-LAST:event_btnGuardarZonasActionPerformed
+     private void anadeListenerTablaZonas(JTable tabla) {
+        tablaZonas.getModel().addTableModelListener(this::actualizartablaZona);
+      } 
+    public void actualizartablaZona(TableModelEvent evento){
+           if (evento.getType() == TableModelEvent.UPDATE) {
+            // Se obtiene el modelo de la tabla y la fila/columna que han cambiado.
+            TableModel modelo2 = ((TableModel) (evento.getSource()));
+            int fila = evento.getFirstRow();
+            int columna = evento.getColumn();
+
+            if (fila == 2 || columna == 6) {
+                return;
+            }
+            
+            updateCellZ();//JOptionPane.showMessageDialog(null,fila) ;
+           }
+      }
+    private void updateCellZ(){
+          int row = tablaZonas.getSelectedRow(); String control="Ok";
+          //Z-CENTRO1|0#23.0:33.0;19.0:33.1    EJEMPLO
+              String nombreZ=String.valueOf(tablaZonas.getValueAt(row,0));
+              String sectorZ=configCoord(String.valueOf(tablaZonas.getValueAt(row,1)));
+              String inicioX=configData(String.valueOf(tablaZonas.getValueAt(row,2)));
+              String finX=configData(String.valueOf(tablaZonas.getValueAt(row,3)));
+              String inicioY=configData(String.valueOf(tablaZonas.getValueAt(row,4)));
+              String finY=configData(String.valueOf(tablaZonas.getValueAt(row,5)));
+              String zona=nombreZ+"|"+sectorZ+"#"+inicioX+":"+finX+";"+inicioY+":"+finY;
+              tablaZonas.setValueAt(zona,row , 6);
+              if((zona.contains("null"))||(zona.contains("N?"))){control="Not";}
+              
+             
+      }
+    private String configCoord(String coord){
+       String result="";
+        if ("null".equals(coord)){
+          return "null";
+      }else{ 
+          if("Urbano".equals(coord)){result="0";} 
+          if("Norte".equals(coord)){result="1";}  
+          if("Sur".equals(coord)){result="2";}  
+          if("Este".equals(coord)){result="3";}
+          if("Oeste".equals(coord)){result="4";}
+        }
+      return result;
+    }
+    private String configData(String dato){
+      //los datos se deben transformar en numero decimal que respresente calle y subvia  
+      String result="";
+      if ("null".equals(dato)){
+          return "null";
+      }else{ 
+        String tipo=  tools.isTipo(dato);
+        switch(tipo){
+            case "l":
+                result = "N?";//JOptionPane.showMessageDialog(null,"tipo de dato incorrecto: "+ dato);
+                break;
+            case "n":
+               //solo recibe valores enteros
+                //los convertira en decimal con un punto
+                result= dato+".0";
+                break;
+
+            case "d":
+                    if (dato.contains(".")){
+                        //aqui casos que se escribe el punto como dato decimal
+                       String segmentos[] = dato.split("\\."); 
+                          if((segmentos.length==2)&&("n".equals(tools.isTipo(segmentos[0])))&&("n".equals(tools.isTipo(segmentos[1])))){
+                          result=dato;
+                          } 
+                              else{result="Error";}
+
+                    }else{
+                    //aqui casos que se puede escribir la calle o la nomenclatura tradicional
+                    String segmento[] = dato.split(" ");
+                         if((segmento.length==2)&&("n".equals(tools.isTipo(segmento[0])))&&("l".equals(tools.isTipo(segmento[1])))){
+
+                             result=segmento[0]+"."+tools.letraToNum(segmento[1]);
+                          } 
+                              else{result="Error";}
+                    }
+                break;
+            default:
+                break;
+        }  
+          
+        
+      }
+      
+        
+      return result;
+    }
     
+    //<editor-fold defaultstate="collapsed" desc="CODIGO:genera combo dentro de celda">
+                private JComboBox generateBox(){
+                 JComboBox bx=null;
+
+                 try
+                 {
+
+                     bx=new JComboBox();
+                     bx.addItem("Urbano");
+                     bx.addItem("Norte");
+                     bx.addItem("Sur");
+                     bx.addItem("Este");
+                     bx.addItem("Oeste");
+
+
+                 }catch(Exception x)
+                 {
+                     System.out.println(x.getMessage());
+                 }
+                         return bx;
+
+             }
+   //</editor-fold>          
     
+  //</editor-fold >   
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

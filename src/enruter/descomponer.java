@@ -49,7 +49,7 @@ public class descomponer {
               sub = (token.nextToken());cont++;
               result = result+"."+sub;
                                            }
-              result = result.substring(1, result.length()) ;
+              result = result.substring(1, result.length()) ; 
               //JOptionPane.showMessageDialog(null, result);
               result = alfanumeric(result);//descomponer alfanumericos
               result = textdelet(result);//eliminando texto inicesario
@@ -185,7 +185,8 @@ String c1="",c2 = "";
        //if ((texto.contains("av."))&&(control==0)){sintaxis="av?";}//si no contiene la expresion completa avenida mas calle o carrera asume estandar de avenida calle
       String segmentos[] = texto.split("\\.");
       //CORREGIMOS Y ELIMINAMOS AL PRINCIPIO DE LA NOMENCLATURA
-      if (segmentos[0].length()==1){result=corregirText(texto,segmentos);}//caso c=calle k=carrera
+      
+      if ((segmentos.length>1)&&(segmentos[0].length()==1)&&("n".equals(isTipo(segmentos[1])))){result=corregirText(texto,segmentos);}//caso c=calle k=carrera
       if (segmentos[0].contains("avn")){result=corregirText(texto,segmentos);}//subfuncion corregirtext encapsuladas en funciones y utiliddes
       if (segmentos[0].contains("crr")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("car")){result=corregirText(texto,segmentos);}
@@ -194,11 +195,12 @@ String c1="",c2 = "";
       if (segmentos[0].contains("cll")){result=corregirText(texto,segmentos);}
        if (segmentos[0].contains("calle")){result=corregirText(texto,segmentos);}
       if (segmentos[0].contains("diag")){result=corregirText(texto,segmentos);}
-      if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))){result=corregirText(texto,segmentos);}
+      if ((segmentos[0].contains("tran"))||(segmentos[0].contains("tranv"))||(segmentos[0].contains("trav"))){result=corregirText(texto,segmentos);}
          Boolean controlXY=  dirsXYnull.containsKey(segmentos[0]);    //CONTROL PERSONALIZADO CON AYUDA DE CORRECCIONES DEL USUARIO
          if((controlXY==true)&&(valor!=null)){
          String valor = dirsXYnull.get(segmentos[0].toString());result=texto.replaceFirst(segmentos[0]+".", valor+".");
          }
+      
          if((buscarH("ca", segmentos)>-1)&&(texto.contains("mz"))){
          segmentos[buscarH("ca", segmentos)]="cs";   result=arrayTostring(segmentos) ;}
       if("".equals(result)){result=texto;}//si no encuentra correccion devuelve el texto completo
@@ -509,7 +511,7 @@ public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=
              }
         
         }
-    }//evaluar manera no cuadra
+    }//
     public void subvial (String st){
     String base = "#abcdefghijklmprstuv";//debemos tener en cuenta la nomenclatura BIS que marca una diferenciacion vial SE EXCLUYE  N, Ñ, O, W
    int control,posicion_numeric;
@@ -554,7 +556,7 @@ public void cardinal(String c){//busca los cardinales con eje X=cl,dg,etc eje Y=
     //JOptionPane.showMessageDialog(null,array[3]+"#"+array[6]);
     //st.indexOf(numeric1);
     
-}//evaluar cuando el numero2 es igual al numero3 no calcula bien
+}//
 private void subVia(String s){
    try{ 
     int control = contLetra1digito;int point;String cadena1,cadena2;
@@ -610,14 +612,16 @@ public String especialcase (String e){
     if((e.contains("av."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=3)){s=2;}
     if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
     if((e.contains("km."))&&("null".equals(sintaxis))&&(contltr>0)&&(contnum>=0)){s=4;}//casos con kilometro
-    if (("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==2)){s=5;}//caso 
+    if (("ltr".equals(sintaxis))&&(contltr>=1)&&(contnum==2)){s=5;}//caso con solo calle y carrera 
     if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
     if (("vialExtra".equals(sintaxis))&&(cardinal1!=null)){s=7;}//casos con mas de 2 letras para determinar subvia
     if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
         if((ee.contains(".mz."))){s=8;}  ;}
     ////////////espacio para otros casos
     if (("null".equals(sintaxis))&&(contltr>0)&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
-    if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=10;}//dejar este como ultimo caso con cero numeros y todas
+    if (("ltr".equals(sintaxis))&&(contltr>0)&&(contnum==1)&&(s==-1)){s=10;}//SI AL MENOS TIENE UN NUMERO
+    if (("null".equals(sintaxis))&&(contnum==0)&&(s==-1)){s=11;}//dejar este como ultimo caso con cero numeros y todas
+    if (("vialExtra".equals(sintaxis))&&(cardinal1==null)){s=12;}//con mas de 2 letras para determinar subvia pero sin Cardinal correspondiente
       switch(s){
         case 0://AQUI EXISTEN 3 NUMEROS MINIMOS CON UNO O MAS TEXTO PERO NO DEFINE CALLE,CARRERA O ALGO SIMILAR: 100 CODIGO CARDINAL INCOMPLETO
              //aqui el algoritmo al tener 3 numeros minimos y unos textos puede comenzar a interpretar arrojar resultados calculados
@@ -639,18 +643,31 @@ public String especialcase (String e){
           if (e.contains(".cr.")==true){array[5]=2;} if (e.contains(".tv.")==true){array[5]=3;} 
               break;
         case 2://casos de avenidas
-               if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
-                 e= buscarList(e)+ e;
-                 coordenada(e);
-                 cardinal(e);
-                 subVia(e);subcardinal(e);
-              codigo();
-               }else{
-                     array[2]=numeric1;array[5]=numeric2;array[7]=1;
-                     e=sintax(cadena3num);
+            ///caso especial cuando contiene avenida y cardinal(cl,cr.dg,tv)
+            if(("".equals(cardinal2))||(cardinal2==null)){//si no contiene otro cardinal procesa asi
+                   if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
+                     e= buscarList(e)+ e;
+                     inicomponentes();e=sintax(e); expresion(e);
                      coordenada(e);
-                     subvial(e);
-                   }
+                     cardinal(e);
+                     subVia(e);subcardinal(e);
+                     codigo();
+                   }else{
+                         array[2]=numeric1;array[5]=numeric2;array[7]=1;
+                         e=sintax(cadena3num);
+                         coordenada(e);
+                         subvial(e);
+                       }
+            } else  {//entonces if si contiene otro cardinal
+                inicomponentes();
+               if(("cl".equals(cardinal2))||("dg".equals(cardinal2))){e="cr."+e;}//{t=e.replaceFirst("av.", "cr.");}
+               if(("cr".equals(cardinal2))||("tv".equals(cardinal2))){e="cl."+e;}//{t=e.replaceFirst("av.", "cl.");}
+                e=sintax(e); expresion(e);
+                     coordenada(e);
+                     cardinal(e);
+                     subVia(e);subcardinal(e);
+                     codigo();
+            }      
               break; 
         case 3: //if(("null".equals(sintaxis))&&(contltr>0)&&(contnum==2)){s=3;}
                if (!"null".equals(buscarList(e))){//busca en lista de direcciones equivalencias con ak o ac en los nombres de avenidas
@@ -669,7 +686,8 @@ public String especialcase (String e){
              array[0]=400;array[2]=numeric1;array[3]=numeric2;array[4]=numeric3;array[8]=0; //JOptionPane.showMessageDialog(null, "si");
               break;
         case 5://AQUI COTEJAMOS LOS CASOS con referencia de calle y/o carrera pero solo 2 numeros: casos que definen esquinas
-             cardinal(e);array[0]=105;
+             
+            cardinal(e);array[0]=105;
               break; 
         case 6://AQUI COTEJAMOS LOS CASOS CON NOMENCLATURA INVERTIDA
              String nuevoText=invertir(e);inicomponentes();
@@ -735,7 +753,10 @@ public String especialcase (String e){
               e=e;array[7]=contnum;array[8]=posicion;//numeric1;
               
               break;
-          case 10:
+         case 10:
+             e="ErrXY: "+e;array[7]=numeric1;
+             break;
+          case 11:
               String segment[] = textIni.split(" ");
               if("null:".equals(segment[0])){
                  e="Error:"+e; 
@@ -743,7 +764,14 @@ public String especialcase (String e){
               e="Rural: "+arrayTostring(segment);array[0]=510;
               valorNumerico(segment);
               }
-              break;    
+              break; 
+          case 12:
+              /////sin subvia sin manzana y sin cardinal pero con mas de 3 letras de subvia, entonces,ignorar 3abc y ordenar por alfabetico 
+             String letra11= e.substring(0,1);int posicion1=0;
+              if (isletra(letra11)==true){posicion1=baseabc.indexOf(letra11);}
+              e=e;array[7]=contnum;array[8]=posicion1;//numeric1; 
+              break;
+  /////////////////////DEFAULT//////////////////////////////            
           default:
             
               e="Error:";
@@ -975,6 +1003,9 @@ public String codigo (){
                break;
           case "tran":
             result=  exp.replaceFirst("tran.", "tv.");   
+               break; 
+          case "trav":
+            result=  exp.replaceFirst("trav.", "tv.");   
                break;     
            case "crr":
             result=  exp.replaceFirst("crr.", "cr.");   

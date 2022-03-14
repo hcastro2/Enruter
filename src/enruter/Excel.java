@@ -31,9 +31,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import jxl.*;
 import jxl.read.biff.BiffException;
 import jxl.write.*; 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -271,12 +269,21 @@ public  void importCsv() throws IOException {
              //l.add(filcont+";"+line+";"+cadena+";"+codigo+";"+valor);//llaves
              l.add(new llaves(line, "", cadena, codigo, filcont, valor));//l.add(new llaves(filcont, line, codigo, valor));
             }
-            fields = removeTrailingQuotes(fields);
+            fields = removeTrailingQuotes(fields);//se usa para los  SEPARADORES
          // System.out.println(Arrays.toString(fields));
             filcont++;           //    form_geo.datoGlobal=String.valueOf(filcont);
             line = br.readLine();
          }
          d=null;br=null;zn=null;bzn=null;
+///////////////COMPROBAMOS SI YA EXISTE UN ARCHIVO EN LA RUTA ESTABLECIDA////////////////
+        String strPath = form_geo.pathJar,f = strPath+"result.csv";;//System.getProperty("user.home");  
+           File fichero = new File(f);
+           if (fichero.exists()){
+           int r=    JOptionPane.showConfirmDialog(null, "Si: Para crear nuevo\nNo: Para agregar los datos", "Ya Existe Reporte", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+              if(r==0){fichero.delete();}
+           //JOptionPane.showMessageDialog(null,r);
+           }else{
+           }
 //////////////////////////ORDENANDO LA LISTA////////////////////////////////////////////////////////////
         Collections.sort(l, new Comparator<llaves>(){
               public int compare(llaves o1, llaves o2) {

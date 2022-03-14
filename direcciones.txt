@@ -1,7 +1,7 @@
 av.19,cr.
-av.americas,ak.13.
-av.las.americas,ak.13.
-av.colombia,ac.10.
+av.americas,cr.13.
+av.las.americas,cr.13.
+av.colombia,cr.10.
 av.treinta.de.agosto,cl.5.
 av.3.norte,cr.
 av.4.norte,cr.

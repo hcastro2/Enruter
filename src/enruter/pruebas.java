@@ -127,13 +127,13 @@ public class pruebas extends javax.swing.JFrame {
     public void runing(){
            Thread hilos = new Thread(){
         public void run(){
-        jProgressBar1.setMaximum(300000);
+        
         for(int a=0;a<300000;a++){
             System.out.println("numero: "+a);
           etiquetaReloj.setText(String.valueOf(a));//  jProgressBar1.setValue(a);
             
         }
-        jProgressBar1.setValue(0);
+        
         }
         };
         hilos.start();
@@ -181,4 +181,25 @@ public class pruebas extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+}
+
+
+class increment{
+    
+    
+	
+	
+ 
+	public void actionPerformed(ActionEvent arg0) {
+		final SwingWorker worker = new SwingWorker(){
+ 
+			@Override
+			protected Object doInBackground() throws Exception {
+				//METODO AQUI	
+				return null;
+			}	
+		};
+		worker.execute();
+	}
+    
 }

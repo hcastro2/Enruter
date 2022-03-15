@@ -23,6 +23,7 @@ public static String nomenclatura;
     /**
      * @param args the command line arguments
      */
+@SuppressWarnings("Convert2Lambda")
     public static void main(String[] args) {//clase exclusiva para I/O entrada salida de datos del usuario y hacer pruebas
         // TODO code application logic here
         

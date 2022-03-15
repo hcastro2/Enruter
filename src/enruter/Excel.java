@@ -1,6 +1,7 @@
 
 package enruter;
 
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -158,7 +159,7 @@ public   void importExcel() throws IOException {
     /////////////////////////////////////////////////////////////////////////////////////////        
             filas = sheetx.getPhysicalNumberOfRows();
             columnas = sheetx.getRow(0).getPhysicalNumberOfCells();
-            
+    if((columnas<2)||(columnas>2)){JOptionPane.showMessageDialog(null,"Solo se admiten dos columnas para archivos XLSX\nColumna: Direcciones\nColumna: Codigo de la ciudad");return;}        
             Object tablax[][] = new Object [columnas+6][filas-1];
             int colcontx=0,filcontx=0,contTitulosx=0;;
             String encabezadosx[] = new String[columnas+6];
@@ -225,14 +226,15 @@ public   void importExcel() throws IOException {
                     
                    break;    
             }
+            
        } catch (FileNotFoundException ex) {
          JOptionPane.showMessageDialog(null,ex.getMessage());
       } catch (BiffException ex) {
           Logger.getLogger(Excel.class.getName()).log(Level.SEVERE, null, ex);
       }   
-      /*   } catch (Exception e) {
+     /* catch (Exception e) {
         JOptionPane.showMessageDialog(null,"Error "+e.getMessage());
-    }*/
+      }*/
         
     }//fin del if 
            else{
@@ -309,7 +311,7 @@ public  void importCsv() throws IOException {
        System.gc();zn=null;bzn=null;l=null;br=null; 
 ///////////////////////////////////////////////////////////////////////////////////////////////
          JOptionPane.showMessageDialog(null, "Proceso Finalizado");
-      } catch (Exception e) {
+      } catch (HeadlessException | IOException e) {
           //JOptionPane.showMessageDialog(null, e.getStackTrace());
          if (null!=br) {
             br.close();}
@@ -324,7 +326,8 @@ private static String[] removeTrailingQuotes(String[] fields) {
       }
       return result;
    }
-public  void exportExcel(Object data[][], Object cabecera[]) throws BiffException {
+ @SuppressWarnings("UnusedAssignment")
+ public  void exportExcel(Object data[][], Object cabecera[]) throws BiffException {
     int columnas=data.length,matchfil;
     try
     {

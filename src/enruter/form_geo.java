@@ -13,10 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -26,10 +22,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import org.apache.poi.ss.formula.functions.T;
+
 /**
  *
  * @author 57321
@@ -43,16 +40,15 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         lbProgreso.setVisible(false);//  ajustaricon();
       this.getContentPane().setBackground(Color.white);
       this.Home.setBackground(Color.white);
-        btn_procesar.addActionListener(this);
-        btn_open1.addActionListener(this);
-        anadeListenerAlModelo(tabla1);anadeListenerTablaZonas(tablaZonas);
-        checkColumn2.addActionListener(this);
-        tablaZonas.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(generateBox()));
-        tablaZonas.setColumnSelectionAllowed(true);
+      anadeListenerAlModelo(tabla1);anadeListenerTablaZonas(tablaZonas);
+      tablaZonas.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(generateBox()));
+      tablaZonas.setColumnSelectionAllowed(true);
+       addListeners();  //agrega los listeners 
     }
-public static void runing(){
-   
-            //lb_zona.setText(datoGlobal); 
+    private  void addListeners(){
+         checkColumn2.addActionListener(this);
+         btn_procesar.addActionListener(this);
+         btn_open1.addActionListener(this);
     
 }
 // public static Properties config = new Properties();
@@ -66,7 +62,7 @@ public static void runing(){
         if (ae.getSource()==checkColumn2){
             Object[] estado= checkColumn2.getSelectedObjects();
            
-          if (estado==null){   ;return;}  
+          if (estado==null){   return;}  
             if (estado[0]=="Editar"){
                 //tabla1.setModel(new DefaultTableModel(){ @Override public boolean isCellEditable(int row, int column) { if (column == x) { return true; } else return false; } }); 
                 //Class<?> col_clas = tabla1.getColumnClass(1);
@@ -122,6 +118,7 @@ public static void runing(){
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLayeredPane2 = new javax.swing.JLayeredPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         Home = new javax.swing.JPanel();
         lb_zona = new javax.swing.JLabel();
@@ -173,6 +170,8 @@ public static void runing(){
                 formWindowOpened(evt);
             }
         });
+
+        jLayeredPane2.setLayout(new java.awt.GridLayout());
 
         jTabbedPane1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -369,7 +368,7 @@ public static void runing(){
                                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addComponent(lista_ciudades, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(236, Short.MAX_VALUE))
+                .addContainerGap(260, Short.MAX_VALUE))
         );
         HomeLayout.setVerticalGroup(
             HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -477,7 +476,7 @@ public static void runing(){
         panelZonas.setLayout(panelZonasLayout);
         panelZonasLayout.setHorizontalGroup(
             panelZonasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
             .addGroup(panelZonasLayout.createSequentialGroup()
                 .addGap(60, 60, 60)
                 .addComponent(btnGuardarZonas, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -489,7 +488,7 @@ public static void runing(){
                 .addComponent(btnGuardarZonas)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Zonas", panelZonas);
@@ -570,7 +569,7 @@ public static void runing(){
                         .addComponent(checkColumn2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("NoProcesadas", panelHistoric);
@@ -604,19 +603,17 @@ public static void runing(){
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(Ordenar, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(168, 168, 168))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Ordenar, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(218, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(Ordenar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(19, 19, 19)
+                .addComponent(Ordenar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -642,7 +639,7 @@ public static void runing(){
                     .addComponent(txPathReports))
                 .addGap(18, 18, 18)
                 .addComponent(btnSelectPath)
-                .addContainerGap(117, Short.MAX_VALUE))
+                .addContainerGap(141, Short.MAX_VALUE))
         );
         configLayout.setVerticalGroup(
             configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -653,26 +650,28 @@ public static void runing(){
                 .addGroup(configLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txPathReports, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSelectPath))
-                .addContainerGap(270, Short.MAX_VALUE))
+                .addContainerGap(296, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Configuracion", null, config, "Seleccione Donde guardar sus archivos");
+
+        jLayeredPane2.add(jTabbedPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLayeredPane2)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLayeredPane2)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -790,8 +789,8 @@ public static void runing(){
         int cont=0;
        for (Object i: ciudades.ciudades){
           if(i==null){}else{ 
-          String texto[]=  ciudades.ciudades.get(cont).split("-");
-          ciudDep=texto[0].toLowerCase();idCiud=texto[1];//Integer.parseInt(texto[1]);
+          String texto1[]=  ciudades.ciudades.get(cont).split("-");
+          ciudDep=texto1[0].toLowerCase();idCiud=texto1[1];//Integer.parseInt(texto[1]);
           ciudades.mapCiud.put(ciudDep, idCiud);//(ciudDep, idCiud);
            lista_ciudades.addItem(ciudades.ciudades.get(cont));cont++;
           }
@@ -831,6 +830,7 @@ public static void runing(){
     private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
     // lbProcesando.setVisible(true);
         try {
+   
           Excel ex = new Excel();
           
         // ajustaricon();//muestra gif de procesando
@@ -838,6 +838,7 @@ public static void runing(){
           ex.importExcel();
           llenarTable(descomponer.DirErrColect);//LLENA LA TABLA CON LAS DIRECCIONES NO LEIDAS
            descomponer.exportar_TextBasura(descomponer.garbagColect);
+           
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
@@ -856,7 +857,11 @@ public static void runing(){
     }//GEN-LAST:event_lista_ciudadesItemStateChanged
     
     private void btnCsvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCsvActionPerformed
-           
+        final SwingWorker worker = new SwingWorker(){
+ 
+			@Override
+			protected Object doInBackground() throws Exception {
+				//METODO AQUI	   
         try {
           Excel ex = new Excel();
           lbProgreso.setVisible(true);
@@ -866,6 +871,11 @@ public static void runing(){
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
+     	return null;
+			}	
+		};
+		worker.execute();   
+        
     }//GEN-LAST:event_btnCsvActionPerformed
     //</editor-fold > 
      //<editor-fold defaultstate="collapsed" desc="FUNCIONES Y CODIGOS JTABLE NOCORREGIDOS">
@@ -957,9 +967,11 @@ public static void runing(){
 	        System.out.println(key + " = " + descomponer.dirsXYnull.get(key)); 
 	        }
             Properties p = new Properties();  
-            FileOutputStream fOutputStream = new FileOutputStream("propiedades.properties");    
-             p.setProperty("dirsXY", llavesXY);p.store(fOutputStream, "");
-            fOutputStream.close();   
+                //FileOutputStream fOutputStream = new FileOutputStream("propiedades.properties");//original
+                try (FileOutputStream fOutputStream = new FileOutputStream("propiedades.properties")) {
+                    //FileOutputStream fOutputStream = new FileOutputStream("propiedades.properties");//original
+                    p.setProperty("dirsXY", llavesXY);p.store(fOutputStream, "");   
+                }
             } 
             
      
@@ -972,13 +984,13 @@ public static void runing(){
         String path= f.getAbsolutePath().replace(".", "");//obtengo ruta del path
         //JOptionPane.showMessageDialog(null, path);
         try{
-           String llavesXY="";
+           String llavesXY;
            Properties propiedades = new Properties();
            propiedades.load(new FileReader(path+"propiedades.properties"));
            llavesXY = propiedades.getProperty("dirsXY");
-           String texto[]=  llavesXY.split(";");
-           if(texto.length>0){
-               for(String txt:texto){
+           String texto2[]=  llavesXY.split(";");
+           if(texto2.length>0){
+               for(String txt:texto2){
                    String seg[]=  txt.split(",");
                    descomponer.dirsXYnull.put(seg[0], seg[1]);
                }
@@ -1020,9 +1032,11 @@ public static void runing(){
         
         try{
             Properties p = new Properties();  
-            FileOutputStream fOutputStream = new FileOutputStream("main.properties"); 
-            p.setProperty("pathReports", path);p.store(fOutputStream, "");
-            fOutputStream.close();
+            // FileOutputStream fOutputStream = new FileOutputStream("main.properties"); // original
+            try (FileOutputStream fOutputStream = new FileOutputStream("main.properties")) {
+                // FileOutputStream fOutputStream = new FileOutputStream("main.properties"); // original
+                p.setProperty("pathReports", path);p.store(fOutputStream, "");
+            }
         } catch(IOException e){
             JOptionPane.showMessageDialog(null, "Error guardando configuración\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -1085,7 +1099,7 @@ public static void runing(){
             int fila = evento.getFirstRow();
             int columna = evento.getColumn();
 
-            if (fila == 2 || columna == 6) {
+            if (fila == -1 || columna == 6) {
                 return;
             }
             
@@ -1102,8 +1116,9 @@ public static void runing(){
               String inicioY=configData(String.valueOf(tablaZonas.getValueAt(row,4)));
               String finY=configData(String.valueOf(tablaZonas.getValueAt(row,5)));
               String zona=nombreZ+"|"+sectorZ+"#"+inicioX+":"+finX+";"+inicioY+":"+finY;
+              if(String.valueOf(tablaZonas.getValueAt(row,0)).equals("null")){zona="null";}
               tablaZonas.setValueAt(zona,row , 6);
-              if((zona.contains("null"))||(zona.contains("N?"))){control="Not";}
+              
               
              
       }
@@ -1245,6 +1260,7 @@ public static void runing(){
     private javax.swing.JToggleButton importarDirs;
     private javax.swing.JButton jButton1;
     private javax.swing.JLayeredPane jLayeredPane1;
+    private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

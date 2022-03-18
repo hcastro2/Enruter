@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package enruter;
+
 import static enruter.dirTest.listaDirecciones;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -14,9 +15,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -49,6 +53,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
          checkColumn2.addActionListener(this);
          btn_procesar.addActionListener(this);
          btn_open1.addActionListener(this);
+         Filtrar.addActionListener(this);
+         //txt_Output.addActionListener(this);
     
 }
 // public static Properties config = new Properties();
@@ -59,6 +65,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         if (ae.getSource()==btn_procesar){
              agregarTotxt(btn_procesar.getText());	
          }
+        
         if (ae.getSource()==checkColumn2){
             Object[] estado= checkColumn2.getSelectedObjects();
            
@@ -79,6 +86,9 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
             }
              
          }
+        if (ae.getSource()==Filtrar){//boton filtrar de la tabla direcciones
+             filtrar();
+        }
         if (ae.getSource()==btn_open1){
                ListaDirecciones l = new ListaDirecciones();
               try {
@@ -92,7 +102,21 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
          }
       }
     
-     
+    private void obtenerRuta(){////LEER ARCHIVO MAIN DE CONFIGURACION INCIAL SINO POR DEFECTO//////////////////////////////////////////////
+       //String contexto;
+       if ((pathJar==null)||("".equals(pathJar))){
+                File f = new File(".");
+                String path= f.getAbsolutePath().replace(".", "");//obtengo ruta del path
+                lbInfopath.setText("Ruta de Informes:");
+                txPathReports.setText(path);
+                pathJar=txPathReports.getText();
+       }else{
+           txPathReports.setText(pathJar);
+        //si no esta vacio ni nulo mantiene el dato en la variable global path
+        //contexto=  pathJar;
+        //      contexto =  System.getProperty("user.dir");
+       }//JOptionPane.showMessageDialog(null, "E");
+    } 
     public void agregarTotxt(String a){
         String valor = a;
         txt_result.setText(texto);
@@ -141,6 +165,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         btn_zonalHistoric = new javax.swing.JButton();
         btn_zonal = new javax.swing.JButton();
         lbProgreso = new javax.swing.JLabel();
+        txt_Output = new javax.swing.JTextField();
         panelZonas = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaZonas = new javax.swing.JTable();
@@ -156,6 +181,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaDirecciones = new javax.swing.JTable();
         Ordenar = new javax.swing.JButton();
+        Filtrar = new javax.swing.JButton();
+        txt_filtro = new javax.swing.JTextField();
         config = new javax.swing.JPanel();
         txPathReports = new javax.swing.JTextField();
         btnSelectPath = new javax.swing.JButton();
@@ -354,27 +381,30 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
                 .addContainerGap()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txt_entrada)
-                        .addComponent(txt_result)
-                        .addGroup(HomeLayout.createSequentialGroup()
-                            .addGap(14, 14, 14)
-                            .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(HomeLayout.createSequentialGroup()
-                                    .addComponent(lb_codigo, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addComponent(lista_ciudades, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_entrada)
+                    .addComponent(txt_result)
+                    .addGroup(HomeLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(HomeLayout.createSequentialGroup()
+                                .addComponent(lb_codigo, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(lista_ciudades, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(260, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, HomeLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txt_Output, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         HomeLayout.setVerticalGroup(
             HomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(HomeLayout.createSequentialGroup()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 24, Short.MAX_VALUE))
             .addGroup(HomeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lista_ciudades, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -388,9 +418,10 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lb_zona, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40)
+                .addGap(42, 42, 42)
                 .addComponent(lbProgreso, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txt_Output, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jTabbedPane1.addTab("Home", Home);
@@ -585,7 +616,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
 
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Cadena", "Codigo", "Direccion", "Valor Numerico"
             }
         ));
         jScrollPane3.setViewportView(tablaDirecciones);
@@ -597,6 +628,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
             }
         });
 
+        Filtrar.setText("Filtrar");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -604,15 +637,24 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Ordenar, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(218, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(Ordenar, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36)
+                        .addComponent(txt_filtro, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addComponent(Filtrar)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addComponent(Ordenar)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Ordenar)
+                    .addComponent(Filtrar)
+                    .addComponent(txt_filtro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -748,7 +790,9 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
        JOptionPane.showMessageDialog(null, r);
          
     }//GEN-LAST:event_jButton1ActionPerformed
-
+   //</editor-fold>
+    
+//<editor-fold defaultstate="collapsed" desc="Generated Codigo jTabeed,jPanel,Tabla direcciones">     
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
        try{
       
@@ -766,51 +810,39 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
              JOptionPane.showMessageDialog(null, "Error: "+e);
     }//tablaDirecciones.removeRowSelectionInterval(0, tablaDirecciones.getRowCount());
     }//GEN-LAST:event_jTabbedPane1MouseClicked
-//</editor-fold>
-    private void obtenerRuta(){////LEER ARCHIVO MAIN DE CONFIGURACION INCIAL SINO POR DEFECTO//////////////////////////////////////////////
-       //String contexto;
-       if ((pathJar==null)||("".equals(pathJar))){
-                File f = new File(".");
-                String path= f.getAbsolutePath().replace(".", "");//obtengo ruta del path
-                lbInfopath.setText("Ruta de Informes:");
-                txPathReports.setText(path);
-                pathJar=txPathReports.getText();
-       }else{
-           txPathReports.setText(pathJar);
-        //si no esta vacio ni nulo mantiene el dato en la variable global path
-        //contexto=  pathJar;
-        //      contexto =  System.getProperty("user.dir");
-       }//JOptionPane.showMessageDialog(null, "E");
+
+    private void jPanel1ComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentHidden
+       updateTable();
+    }//GEN-LAST:event_jPanel1ComponentHidden
+    
+    private void filtrar(){
+       String filtro=   txt_filtro.getText(); 
+        if((dirTest.listaDirecciones==null)||(dirTest.listaDirecciones.size()<1)){}else{
+            
+       List<idDirZona> dir =  dirTest.listaDirecciones.stream()
+                  .filter(p->p.getCadena().contains(filtro))
+                  .collect(Collectors.toList());
+               
+          DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
+          model2.setRowCount(0);
+            for (int cont=0;cont<dir.size();cont++ ) {
+               // JOptionPane.showMessageDialog(null,dir.get(0).getDireccion());
+                Object nuevo[]= {dir.get(cont).cadena,dir.get(cont).codigo,dir.get(cont).direccion,dir.get(cont).valorNum};
+            model2.addRow(nuevo);
+            }
+        }
+        // JOptionPane.showMessageDialog(null,"");
     }
     
-    private void llenarCombo(){
-        String ciudDep, idCiud;
-        if(ciudades.ciudades==null){ JOptionPane.showMessageDialog(null,"No Found Ciudades");}else{
-        int cont=0;
-       for (Object i: ciudades.ciudades){
-          if(i==null){}else{ 
-          String texto1[]=  ciudades.ciudades.get(cont).split("-");
-          ciudDep=texto1[0].toLowerCase();idCiud=texto1[1];//Integer.parseInt(texto[1]);
-          ciudades.mapCiud.put(ciudDep, idCiud);//(ciudDep, idCiud);
-           lista_ciudades.addItem(ciudades.ciudades.get(cont));cont++;
-          }
-        }
-      }
-    }
-//<editor-fold defaultstate="collapsed" desc="objetos: jPanel1,btnExcel,btnCsv,listciud btn,lb,txt...">     
-    private void jPanel1ComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentHidden
-       limpiarTable();
-    }//GEN-LAST:event_jPanel1ComponentHidden
-
     private void OrdenarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OrdenarActionPerformed
-        limpiarTable();
+        updateTable();
         llenarTable();
     }//GEN-LAST:event_OrdenarActionPerformed
         private void llenarTable(){
           int cont=0;
              if(tablaDirecciones.getRowCount()!=0){}else{
              
-           if(dirTest.listaDirecciones.size()<1){}else{
+           if((dirTest.listaDirecciones==null)||(dirTest.listaDirecciones.size()<1)){}else{
            
             DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
             for (Object i: dirTest.listaDirecciones ) {
@@ -820,13 +852,19 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
              }
             }
     }
-        private void limpiarTable(){
+        private void updateTable(){//ordena la tabla
         if(tablaDirecciones.getRowCount()==0){}else{
         Collections.sort(listaDirecciones,new CompararIdZonas());//LINEA QUE ORDENA LAS DIRECCIONES POR CALLE Y CARRERA FALTA NUMERO
         DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();// TODO add your handling code here:
         model2.setRowCount(0);
+           }
+        
         }
-    }
+        
+        
+//</editor-fold >   
+        
+//<editor-fold defaultstate="collapsed" desc="objetos: jPanel1,btnExcel,btnCsv,listciud btn,lb,txt...">        
     private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
     // lbProcesando.setVisible(true);
         try {
@@ -855,8 +893,22 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
       }
      }
     }//GEN-LAST:event_lista_ciudadesItemStateChanged
-    
+        private void llenarCombo(){
+        String ciudDep, idCiud;
+        if(ciudades.ciudades==null){ JOptionPane.showMessageDialog(null,"No Found Ciudades");}else{
+        int cont=0;
+       for (Object i: ciudades.ciudades){
+          if(i==null){}else{ 
+          String texto1[]=  ciudades.ciudades.get(cont).split("-");
+          ciudDep=texto1[0].toLowerCase();idCiud=texto1[1];//Integer.parseInt(texto[1]);
+          ciudades.mapCiud.put(ciudDep, idCiud);//(ciudDep, idCiud);
+           lista_ciudades.addItem(ciudades.ciudades.get(cont));cont++;
+          }
+        }
+      }
+    }//llena el combo ciudades
     private void btnCsvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCsvActionPerformed
+         
         final SwingWorker worker = new SwingWorker(){
  
 			@Override
@@ -865,8 +917,11 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         try {
           Excel ex = new Excel();
           lbProgreso.setVisible(true);
-          ex.importCsv();lbProgreso.setVisible(false);
+          ex.importCsv();lbProgreso.setVisible(false);//txt_Output.setText(datoGlobal);
           llenarTable(descomponer.DirErrColect);//LLENA LA TABLA CON LAS DIRECCIONES NO LEIDAS
+          
+          
+          
          descomponer.exportar_TextBasura(new String(descomponer.garbagColect.getBytes("ISO-8859-1"), "UTF-8"));// JOptionPane.showMessageDialog(null,descomponer.garbagColect);
       } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
@@ -875,7 +930,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
 			}	
 		};
 		worker.execute();   
-        
+     
+                               
     }//GEN-LAST:event_btnCsvActionPerformed
     //</editor-fold > 
      //<editor-fold defaultstate="collapsed" desc="FUNCIONES Y CODIGOS JTABLE NOCORREGIDOS">
@@ -1065,7 +1121,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
      * @param args the command line arguments
      */
     
-//<editor-fold defaultstate="collapsed" desc="CODIGOS JTABLE ZONAS">     
+//<editor-fold defaultstate="collapsed" desc="Generated Codigo CODIGOS JTABLE ZONAS">     
     private void btnGuardarZonasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarZonasActionPerformed
         String acumZonas=""; // TODO add your handling code here:
           int filas = tablaZonas.getRowCount();int conta=0,contrr=0;//JOptionPane.showMessageDialog(null, );
@@ -1123,6 +1179,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
              
       }
     private String configCoord(String coord){
+        //pasar a expresion lambda
        String result="";
         if ("null".equals(coord)){
           return "null";
@@ -1206,7 +1263,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
              }
    //</editor-fold>          
     
-  //</editor-fold >   
+  //</editor-fold >
+                
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1240,6 +1298,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
      
 //<editor-fold defaultstate="collapsed" desc="Variables declaration">
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Filtrar;
     private javax.swing.JPanel Home;
     private javax.swing.JButton Ordenar;
     private javax.swing.JButton btRowMas;
@@ -1280,7 +1339,9 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTable tablaDirecciones;
     private javax.swing.JTable tablaZonas;
     private javax.swing.JTextField txPathReports;
+    public static javax.swing.JTextField txt_Output;
     private javax.swing.JTextField txt_entrada;
+    private javax.swing.JTextField txt_filtro;
     private javax.swing.JTextField txt_result;
     // End of variables declaration//GEN-END:variables
 //</editor-fold>

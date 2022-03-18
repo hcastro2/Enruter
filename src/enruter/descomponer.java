@@ -616,7 +616,7 @@ public String especialcase (String e){
     if (("invertido".equals(sintaxis))&&(contltr>=1)&&(contnum>=3)){s=6;} //caso con sintaxis invertida
     if (("vialExtra".equals(sintaxis))&&(cardinal1!=null)){s=7;}//casos con mas de 2 letras para determinar subvia
     if (("mz".equals(sintaxis))&&(s==-1)){String ee="."+e+"."; 
-        if((ee.contains(".mz."))){s=8;}  ;}
+        if((ee.contains(".mz."))){s=8;}  }
     ////////////espacio para otros casos
     if (("null".equals(sintaxis))&&(contltr>0)&&(contnum>0)&&(contnum<=2)&&(s==-1)){s=9;}//SI AL MENOS TIENE UN NUMERO
     if (("ltr".equals(sintaxis))&&(contltr>0)&&(contnum==1)&&(s==-1)){s=10;}//SI AL MENOS TIENE UN NUMERO
@@ -742,7 +742,7 @@ public String especialcase (String e){
                  array[8]="0";}//si al final no encuentra nada asigna cero a la posicion 8 del array 
                 }
              int matchMz = Integer.parseInt(array[5].toString()) , matchCs=Integer.parseInt(array[8].toString());  
-             if((matchMz<1)||(matchCs<1)){
+             if((matchMz<1)||(matchCs<1)){//si despues de todo hay error se le asigna codigo 508 
               e="ErrMz: "+arrayTostring(segmentos2);array[0]=508;}
               
               

@@ -273,7 +273,7 @@ public  void importCsv() throws IOException {
             }
             fields = removeTrailingQuotes(fields);//se usa para los  SEPARADORES
          // System.out.println(Arrays.toString(fields));
-            filcont++;           //    form_geo.datoGlobal=String.valueOf(filcont);
+            filcont++;  form_geo.datoGlobal=String.valueOf(filcont);       //    form_geo.datoGlobal=String.valueOf(filcont);
             line = br.readLine();
          }
          d=null;br=null;zn=null;bzn=null;

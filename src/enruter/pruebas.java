@@ -9,7 +9,11 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.swing.AbstractAction;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 /**
  *
@@ -55,8 +59,6 @@ public class pruebas extends javax.swing.JFrame {
 
         etiquetaReloj.setText("jLabel1");
 
-        jTextField1.setText("jTextField1");
-
         jLabel1.setText("jLabel1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -66,14 +68,14 @@ public class pruebas extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(74, 74, 74)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(49, 49, 49)
                         .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(104, 104, 104)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(74, 74, 74)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(161, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(133, 133, 133)
@@ -102,9 +104,22 @@ public class pruebas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        runing();// TODO add your handling code here:
+        Object obj = null;//runing();// TODO add your handling code here:
+        //Supplier obj = () -> jTextField1.getText();
+       obj =  jTextField1.getText();
+      //  obj = "dummy";
+       // obj = 4;
+        
+        
+        
+        JOptionPane.showMessageDialog(null,((Object)obj).getClass());
     }//GEN-LAST:event_jButton1ActionPerformed
-     private void inicio(){
+    private void logmensaje(Object s){
+        
+       JOptionPane.showMessageDialog(null, "");
+    }
+    
+    private void inicio(){
      DateTimeFormatter formateador = DateTimeFormatter.ofPattern("HH:mm:ss");
       Runnable runnable = new Runnable() {
      @Override
@@ -184,22 +199,11 @@ public class pruebas extends javax.swing.JFrame {
 }
 
 
-class increment{
-    
-    
-	
-	
- 
-	public void actionPerformed(ActionEvent arg0) {
-		final SwingWorker worker = new SwingWorker(){
- 
-			@Override
-			protected Object doInBackground() throws Exception {
-				//METODO AQUI	
-				return null;
-			}	
-		};
-		worker.execute();
-	}
-    
+class Typetester { 
+   public static String printType(byte x) { return "byte"; } 
+   public static String printType(int x) { return "int"; } 
+   public static String printType(float x) { return "float"; } 
+   public static String printType(double x) { return "double"; } 
+   public static String printType(char x) { return "char"; } 
 }
+

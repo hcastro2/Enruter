@@ -15,10 +15,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -808,30 +806,23 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
     }//GEN-LAST:event_jPanel1ComponentHidden
     
     private void filtrar(){
-       String filtro=   txt_filtro.getText();Object[] idz2;
+       String filtro=   txt_filtro.getText();//Object[] idz2;
         if((dirTest.listaDirecciones==null)||(dirTest.listaDirecciones.size()<1)){}else{
             
        List<Object> dir =  dirTest.listaDirecciones.stream()//List<idDirZona> dir =  dirTest.listaDirecciones.stream()
                   .filter(p->p.getCadena().contains(filtro))
                   .sorted((e1, e2) -> e1.getDireccion().compareTo(e2.getDireccion()))
-                  .map(p->idzToArray(p))
+                  .map(p->idzToArray(p))//convertimos al objeto idzona en objeto generico por addrow que solo acepta objetos
                   .collect(Collectors.toList());
                
      DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();      
       // Object[] idz = dir.toArray(Object[]::new); model2.setRowCount(0);
-      
-      
-      //DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();   
           model2.setRowCount(0);
-            for (int cont=0;cont<dir.size();cont++ ) {
-              model2.addRow((Object[]) dir.get(cont));
-             //   Object nuevo[]= {dir.get(cont).cadena,dir.get(cont).codigo,dir.get(cont).direccion,dir.get(cont).valorNum};
-           // model2.addRow(idzToArray(dir.get(cont)));    
-           // model2.addRow(nuevo);
-            }
+     dir.forEach(ob->{model2.addRow((Object[]) ob);});
+     // for (Object ob:dir){model2.addRow((Object[])ob);}    
+ 
         }
-        // JOptionPane.showMessageDialog(null,"");
-        
+
     }
     private Object[] idzToArray(idDirZona idz){
         String cadena=idz.getCadena();
@@ -847,16 +838,18 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         llenarTable();
     }//GEN-LAST:event_OrdenarActionPerformed
         private void llenarTable(){
-          int cont=0;
+        
              if(tablaDirecciones.getRowCount()!=0){}else{
              
            if((dirTest.listaDirecciones==null)||(dirTest.listaDirecciones.size()<1)){}else{
+           List<Object> dir =  dirTest.listaDirecciones.stream().map(p->idzToArray(p)).collect(Collectors.toList());
            
             DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
-            for (Object i: dirTest.listaDirecciones ) {
-            Object nuevo[]= {dirTest.listaDirecciones.get(cont).cadena,dirTest.listaDirecciones.get(cont).codigo,dirTest.listaDirecciones.get(cont).direccion,dirTest.listaDirecciones.get(cont).valorNum};
-            model2.addRow(nuevo);cont++;
-              }//JOptionPane.showMessageDialog(null,dirTest.listaDirecciones.get(1).X1);
+            dir.forEach(i -> {model2.addRow((Object[])i);});
+            /*   for (Object i: dirTest.listaDirecciones )   {
+               Object nuevo[]= {dirTest.listaDirecciones.get(cont).cadena,dirTest.listaDirecciones.get(cont).codigo,dirTest.listaDirecciones.get(cont).direccion,dirTest.listaDirecciones.get(cont).valorNum};
+               model2.addRow(nuevo);cont++;
+               }//JOptionPane.showMessageDialog(null,dirTest.listaDirecciones.get(1).X1);*/
              }
             }
     }

@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -53,8 +54,8 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
          checkColumn2.addActionListener(this);
          btn_procesar.addActionListener(this);
          btn_open1.addActionListener(this);
-         Filtrar.addActionListener(this);
-         //txt_Output.addActionListener(this);
+         Filtrar.addActionListener(e -> { filtrar();});//Filtrar.addActionListener(this);
+         //txt_Output.addActionListener(this); (e -> {      ;    });
     
 }
 // public static Properties config = new Properties();
@@ -86,9 +87,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
             }
              
          }
-        if (ae.getSource()==Filtrar){//boton filtrar de la tabla direcciones
-             filtrar();
-        }
+      
         if (ae.getSource()==btn_open1){
                ListaDirecciones l = new ListaDirecciones();
               try {
@@ -795,14 +794,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
 //<editor-fold defaultstate="collapsed" desc="Generated Codigo jTabeed,jPanel,Tabla direcciones">     
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
        try{
-      
-       /* if (jTabbedPane1.getSelectedIndex()==2){
-            // historicZonas.zonash.get(0); JOptionPane.showMessageDialog(null, historicZonas.baseZonasH[0][0]);
-            DefaultTableModel model =  (DefaultTableModel) tabla1.getModel();
-            //tabla1.setValueAt(23, 0, 0);
-            Object nuevo[]= {"",};
-            model.addRow(nuevo);//tablaZonas.setModel(model);
-        }*/
+     
          if (jTabbedPane1.getSelectedIndex()==3){
            llenarTable();
         }
@@ -816,24 +808,40 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
     }//GEN-LAST:event_jPanel1ComponentHidden
     
     private void filtrar(){
-       String filtro=   txt_filtro.getText(); 
+       String filtro=   txt_filtro.getText();Object[] idz2;
         if((dirTest.listaDirecciones==null)||(dirTest.listaDirecciones.size()<1)){}else{
             
-       List<idDirZona> dir =  dirTest.listaDirecciones.stream()
+       List<Object> dir =  dirTest.listaDirecciones.stream()//List<idDirZona> dir =  dirTest.listaDirecciones.stream()
                   .filter(p->p.getCadena().contains(filtro))
+                  .sorted((e1, e2) -> e1.getDireccion().compareTo(e2.getDireccion()))
+                  .map(p->idzToArray(p))
                   .collect(Collectors.toList());
                
-          DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();
+     DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();      
+      // Object[] idz = dir.toArray(Object[]::new); model2.setRowCount(0);
+      
+      
+      //DefaultTableModel model2 =  (DefaultTableModel) tablaDirecciones.getModel();   
           model2.setRowCount(0);
             for (int cont=0;cont<dir.size();cont++ ) {
-               // JOptionPane.showMessageDialog(null,dir.get(0).getDireccion());
-                Object nuevo[]= {dir.get(cont).cadena,dir.get(cont).codigo,dir.get(cont).direccion,dir.get(cont).valorNum};
-            model2.addRow(nuevo);
+              model2.addRow((Object[]) dir.get(cont));
+             //   Object nuevo[]= {dir.get(cont).cadena,dir.get(cont).codigo,dir.get(cont).direccion,dir.get(cont).valorNum};
+           // model2.addRow(idzToArray(dir.get(cont)));    
+           // model2.addRow(nuevo);
             }
         }
         // JOptionPane.showMessageDialog(null,"");
+        
     }
-    
+    private Object[] idzToArray(idDirZona idz){
+        String cadena=idz.getCadena();
+        String codigo=idz.getCodigo();
+        String dir=idz.getDireccion();
+        Double valor=idz.getValorNum();
+        Object vect[]={cadena,codigo,dir,valor};
+      return vect;
+        
+    }
     private void OrdenarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OrdenarActionPerformed
         updateTable();
         llenarTable();

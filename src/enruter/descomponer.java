@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 
+
 public class descomponer {
 // la idea es tomar el texto original y eliminar los posibles errores y particularidades del lenguaje comun    
     public int contnum=0,contLetra1digito=0,contltr=0;Object array[] = new Object[14];String finnumericos,numeric1,numeric2,numeric3;
@@ -1359,7 +1360,7 @@ public void importarDirTest() throws IOException{
     ///////////////// codigo que invoca la clase para procesar las direcciones
      clearFile();//limpiamos el archivo donde se guardan los resultados si existe
     direcciones = new ArrayList<>() ;
-    listaDirecciones = new ArrayList<idDirZona>();
+    listaDirecciones = new ArrayList<>();
      ///////////////////////////////////////////////////////////////////////////////////////////////
     JFileChooser fc = new JFileChooser();
     int respuesta = fc.showOpenDialog(fc); 
@@ -1369,10 +1370,14 @@ public void importarDirTest() throws IOException{
     try {
                 //Crear un objeto File con el archivo elegido
                 File archivoElegido = fc.getSelectedFile();
+    
                 //Mostrar el nombre del archvivo en un campo de texto
     // JOptionPane.showMessageDialog(rootPane, archivoElegido.getAbsoluteFile());// txtNombre.setText(archivoElegido.getName()); 
-           file =archivoElegido.getAbsoluteFile().toString();      
-    //Leo un Archivo de Texto
+           file =archivoElegido.getAbsoluteFile().toString();
+    ////////////////////////////////////////////////////////////////////////////       
+           if (file.endsWith(".txt")){}else
+           {JOptionPane.showMessageDialog(null,"Opcion valida solo para archivos .txt","Extencion Incorrecta",JOptionPane.WARNING_MESSAGE); return;}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     //String file = "C:/pregeo.txt";
     myFile = new FileReader(file);
     BufferedReader InputFile = new BufferedReader(myFile);
@@ -1395,25 +1400,29 @@ public void importarDirTest() throws IOException{
     //jTextField1.setText();//Refresco la Tabla 
     //jTable3.paintImmediately(jTable3.getX(),jTable3.getY(), jTable3.getWidth(), jTable3.getHeight());
 
-    }
-    catch (IOException ex) {
-    }
-    }
-    JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
-    //checklist = " "+i+" Registros";
+        }
+        catch (IOException ex) {
+        }
+        }
+        JOptionPane.showMessageDialog(null,"Se importaron "+i+" Registros");
+        //checklist = " "+i+" Registros";
 
-    } catch (FileNotFoundException ex) {
-    JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
-    } finally {
+        } catch (FileNotFoundException ex) {
+        JOptionPane.showMessageDialog(null," Error en Busqueda de archivo");
+        } finally {
 
-        try {
-    myFile.close();
+            try {
+        //myFile.close();
 
-    } catch (IOException ex) {
-    JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
-    }
-    }
-            }//fin del if 
+        } catch (Exception ex) {
+        JOptionPane.showMessageDialog(null," Error en Lectura de Archivo");
+        }
+        }
+    
+    
+    
+    
+            }//fin del if (respuesta == JFileChooser.APPROVE_OPTION) {
            else{
              JOptionPane.showMessageDialog(null,"Proceso Cancelado");
             }

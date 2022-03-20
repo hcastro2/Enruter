@@ -108,7 +108,7 @@ public class pruebas extends javax.swing.JFrame {
         //Supplier obj = () -> jTextField1.getText();
        obj =  jTextField1.getText();
       //  obj = "dummy";
-       // obj = 4;
+      
         
         
         

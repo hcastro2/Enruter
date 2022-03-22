@@ -31,8 +31,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /**
- *
- * @author 57321
+ *Hector Castro
+ * hcastro2@misena.edu.co
  */
 public class form_geo extends javax.swing.JFrame implements ActionListener {
   String texto;
@@ -43,12 +43,13 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         lbProgreso.setVisible(false);//  ajustaricon();
       this.getContentPane().setBackground(Color.white);
       this.Home.setBackground(Color.white);
-      anadeListenerAlModelo(tabla1);anadeListenerTablaZonas(tablaZonas);
+      
       tablaZonas.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(generateBox()));
       tablaZonas.setColumnSelectionAllowed(true);
        addListeners();  //agrega los listeners 
     }
     private  void addListeners(){
+        anadeListenerAlModelo(tabla1);anadeListenerTablaZonas(tablaZonas);
          checkColumn2.addActionListener(this);
          btn_procesar.addActionListener(this);
          btn_open1.addActionListener(this);
@@ -1185,6 +1186,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         if ("null".equals(coord)){
           return "null";
       }else{ 
+           
           if("Urbano".equals(coord)){result="0";} 
           if("Norte".equals(coord)){result="1";}  
           if("Sur".equals(coord)){result="2";}  

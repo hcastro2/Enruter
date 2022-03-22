@@ -16,8 +16,8 @@ import java.util.function.Supplier;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 /**
- *
- * @author 57321
+ *Hector Castro
+ * hcastro2@misena.edu.co
  */
 public class pruebas extends javax.swing.JFrame {
 

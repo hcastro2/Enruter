@@ -18,8 +18,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -33,6 +36,7 @@ import jxl.*;
 import jxl.read.biff.BiffException;
 import jxl.write.*; 
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -44,12 +48,12 @@ public class Excel{
  List listaOrden;
   public static final String SEPARATOR=";";
    public static final String QUOTE="\"";
-/*public static void main(String[] args) throws Exception {
+public static void main(String[] args) throws Exception {
    
+    ciudades c = new ciudades();c.importCiudades();
+     verificarArchivoXlsx();
     
-  //importExcelXlsx();
-    
-}*/
+}
 public   void importExcel() throws IOException {
     
   JFileChooser fc = new JFileChooser();
@@ -612,7 +616,97 @@ private Object verificarArchivo(String archivo) throws IOException{
 }
      return informe;
 }
-
+private static String verificarArchivoXlsx()throws IOException{
+    int filas,columnas,column,fila,filcont=0,contNum=0,contMatch=0,contLtr=0;
+    String match = null,cellValue;
+    try{
+      String outputFile = "C:\\Users\\Usuario\\Documents\\base direcciones.xlsx";
+      
+      XSSFWorkbook workbook;
+     // XSSFWorkbook representa un archivo de Excel
+     // Crea su objeto, abre este archivo Excel
+     try ( // Crear objeto de flujo de entrada del archivo Excel
+             FileInputStream excelFileInputStream = new FileInputStream(outputFile)) {
+         // XSSFWorkbook representa un archivo de Excel
+         // Crea su objeto, abre este archivo Excel
+         workbook = new XSSFWorkbook(excelFileInputStream);
+         // ¡Cierra la secuencia de entrada a tiempo después de usarla! ¡Este es un hábito excelente en las operaciones de flujo de archivos!
+     }
+                 // XSSFSheet representa una tabla en el archivo de Excel
+                 // Usamos getSheetAt (0) para especificar el índice de la tabla para obtener la tabla correspondiente
+                 // ¡Tenga en cuenta que el índice de la tabla comienza en 0!
+        XSSFSheet sheet = workbook.getSheetAt(0);
+         filas = sheet.getPhysicalNumberOfRows();
+         columnas = sheet.getRow(0).getPhysicalNumberOfCells();
+         Iterator  rows = sheet.rowIterator();
+        //sheet.addMergedRegion(new CellRangeAddress.valueOf("$A$1:$L$1"));//combina celdas
+//////////////AGREGAMOS LA CABECERA DE LA NUEVA COLUMNA EN LA POSICION 3             
+        XSSFCell cellCabecera = sheet.getRow(0).getCell(1);
+        //JOptionPane.showMessageDialog(null,cellCabecera.getStringCellValue());//cell.setCellValue(2);
+        XSSFCell cellCabecera2 = sheet.getRow(0).createCell(2);
+        cellCabecera2.setCellValue(cellCabecera.getStringCellValue());
+        cellCabecera.setCellValue("idCiudad");
+///////////////////////////////////////////////////////////        
+        while (rows.hasNext()) {//RECORRE POR FILAS Y COLUMNAS CADA CELDA
+             XSSFRow row = (XSSFRow) rows.next();
+                 Iterator cells = row.cellIterator();
+                 //List data = new ArrayList();
+            while (cells.hasNext()) { //PASA A LA SIGUIENTE LINEA
+                  
+                    XSSFCell cell = (XSSFCell) cells.next();
+                    column = cell.getColumnIndex(); fila = cell.getRowIndex();
+                if ((column==1)&&(filcont>0)){//aqui aunque recorre toda la matriz solo ejecuta la accion sobre la columna 0 fila 1 ignora encabezados    
+                  //getCellType   1=letras  0=numeros
+                     if(cell.getCellType()==0){contNum++;}
+                     if(cell.getCellType()==1){//contLtr++;match=buscarIdCiudad(cell.toString().toLowerCase());
+                       cellValue=cell.getStringCellValue(); //JOptionPane.showMessageDialog(null,cell.getRowIndex());
+                      int id= buscarCiudStream(cellValue,ciudades.ciudades);//busca dentro de la matriz de ciudades y asigna el codigo
+                       cell.setCellValue(id);
+                     XSSFCell cellNew= row.createCell(column+1);  
+                       cellNew.setCellValue(cellValue);
+                     if(match!=null){
+                         
+                     }
+                     }//JOptionPane.showMessageDialog(null,cell.toString()+"#"+ match);
+                    
+                 }//fin if
+                
+            } //fin while 
+            filcont++;
+     }// fin while
+        
+        
+        
+        
+        FileOutputStream excelFileOutPutStream = new FileOutputStream(outputFile);
+        workbook.write(excelFileOutPutStream);
+         excelFileOutPutStream.flush();// Realice una operación de vaciado para actualizar la información en el área de caché al archivo
+      
+        excelFileOutPutStream.close();//cerramos 
+        
+       JOptionPane.showMessageDialog(null,"Finalizado"); 
+          
+     return "";    
+     ///////////////////////////INCIO DE EXCEPCIONES  
+    } catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null,e.getMessage());     
+     }
+    return null;
+}
+public static int buscarCiudStream(String cadena, ArrayList<String> l){
+    int result = 0;
+    
+    List<String> ciud =  l.stream()
+               .filter(p->p.toLowerCase().contains(cadena.toLowerCase()))
+               //.map(p->{if(p.isEmpty())} ) 
+               .collect(Collectors.toList());
+    if(ciud.isEmpty()){return result;}else{
+    String seg[]=ciud.get(0).split("-");
+    result=Integer.parseInt(seg[1]);
+    }
+     return result;
+    
+}
 public  String buscarIdCiudad(String cadena){
     String result = "";
          //ciudades c = new ciudades();c.importCiudades();

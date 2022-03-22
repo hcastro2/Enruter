@@ -1524,14 +1524,17 @@ class ciudades{
     // Read the first line
     String currentRecord = InputFile.readLine();
      ciudades.add(currentRecord);
-    while(currentRecord != null) {
+    while((currentRecord != null)) {
 
     try {
     //Copio un valor a la celda 
     //JOptionPane.showMessageDialog(null,dirs.size());//jTable3.setValueAt(currentRecord, i, 0);
     currentRecord = InputFile.readLine();
-    if (!"".equals(currentRecord)){
+    if (("".equals(currentRecord))||(currentRecord==null)){
+        //JOptionPane.showMessageDialog(null,"null");
+    }else{
        ciudades.add(currentRecord);
+       
     }
 
     //jTextField1.setText();//Refresco la Tabla 

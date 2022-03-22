@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
- * @author 57321
+ *Hector Castro
+ * hcastro2@misena.edu.co
  */
 public class Enruter {
 public static String nomenclatura;
@@ -40,6 +40,7 @@ public static String nomenclatura;
      form_geo fr = new form_geo(); 
         
          java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 fr.setVisible(true);
                 //new fr. .setVisible(true);
@@ -88,34 +89,36 @@ class tools{
         return result;
     }
     public static void exportarXarchivo(String valor,String nombreArchivo) throws IOException {
-
+//exporta cualquier valor a cualquier archivo especificado como parametro
      try{
         // String strPath = System.getProperty("user.home");
          String strPath = form_geo.pathJar;//
         String f = strPath+nombreArchivo+".txt";
         File file = new File(f); 
-     //Writer escribe = null;//FileOutputStream fis = new FileOutputStream(f);
-     PrintWriter writer = new PrintWriter(f);
-    if (!file.exists()) {
-                file.createNewFile();
-            }
-   // escribe = new BufferedWriter(new OutputStreamWriter(
-     //               new FileOutputStream(file), "UTF8"));
-      //      escribe.write(valor);
-
-    //FileWriter  dos=new FileWriter(f,true);//FileWriter  dos=new FileWriter(f,true);
-    writer.println(valor);
-    //writer.println("\n");
-   // escribe.write((valor==null)?"null":valor);
-    //escribe.write("\n");
-
-    //i=i+1;
-    //}
-    //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
-    writer.close();System.gc();
+         try ( //Writer escribe = null;//FileOutputStream fis = new FileOutputStream(f);
+                 PrintWriter writer = new PrintWriter(f)) {
+             if (!file.exists()) {
+                 file.createNewFile();
+             }
+             // escribe = new BufferedWriter(new OutputStreamWriter(
+             //               new FileOutputStream(file), "UTF8"));
+             //      escribe.write(valor);
+             //FileWriter  dos=new FileWriter(f,true);//FileWriter  dos=new FileWriter(f,true);
+             writer.println(valor);
+             //writer.println("\n");
+             // escribe.write((valor==null)?"null":valor);
+             //escribe.write("\n");
+             //i=i+1;
+             //}
+             //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
+         }
+         // escribe = new BufferedWriter(new OutputStreamWriter(
+         //               new FileOutputStream(file), "UTF8"));
+         //      escribe.write(valor);
+System.gc();
     }
     catch(FileNotFoundException e){
-    System.out.println("No se encontro el archivo");
+    JOptionPane.showMessageDialog(null,"No se encontro el archivo");
     }
     catch(IOException e){
     JOptionPane.showMessageDialog(null, "error");

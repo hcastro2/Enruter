@@ -196,7 +196,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
             }
         });
 
-        jLayeredPane2.setLayout(new java.awt.GridLayout());
+        jLayeredPane2.setLayout(new java.awt.GridLayout(1, 0));
 
         jTabbedPane1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -205,7 +205,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         });
 
         jButton1.setText("zonaP");
-        jButton1.setToolTipText("Buaca la zona aproximada");
+        jButton1.setToolTipText("Busca la zona aproximada");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);

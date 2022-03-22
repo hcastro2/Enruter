@@ -18,15 +18,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import jxl.write.WritableSheet;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -36,7 +32,6 @@ import jxl.*;
 import jxl.read.biff.BiffException;
 import jxl.write.*; 
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -50,10 +45,11 @@ public class Excel{
    public static final String QUOTE="\"";
 public static void main(String[] args) throws Exception {
    
-    ciudades c = new ciudades();c.importCiudades();
-     verificarArchivoXlsx();
-    
+   // ciudades c = new ciudades();c.importCiudades();
+   //  int a = verificarArchivoXlsx();
+   //  JOptionPane.showMessageDialog(null,a);
 }
+@SuppressWarnings("UnusedAssignment")
 public   void importExcel() throws IOException {
     
   JFileChooser fc = new JFileChooser();
@@ -159,11 +155,14 @@ public   void importExcel() throws IOException {
             XSSFSheet sheetx = worbookx.getSheetAt(0);
 
             Iterator<Row> rowsx = sheetx.iterator();
-    ///////////////////////CONTROL PREVIO PARA VERIFICAR CLUMNA 2 DEJAR ESPACIO///////////////
-    /////////////////////////////////////////////////////////////////////////////////////////        
+///////////////////////CONTROL PREVIO PARA VERIFICAR CLUMNA 2 DEJAR ESPACIO///////////////
+    List control = verificarArchivoXlsx(filename);//funcion de control verifica que el archivo contenga en su columna 2 solo numeros;sino, busca en la lista de direcciones el codigo correspondiente siendo cel codigo o cero
             filas = sheetx.getPhysicalNumberOfRows();
             columnas = sheetx.getRow(0).getPhysicalNumberOfCells();
-    if((columnas<2)||(columnas>2)){JOptionPane.showMessageDialog(null,"Solo se admiten dos columnas para archivos XLSX\nColumna: Direcciones\nColumna: Codigo de la ciudad");return;}        
+    if((columnas<2)||(columnas>2)||((int)control.get(0)!=0)){JOptionPane.showMessageDialog(null,"Solo se admiten dos columnas para archivos XLSX\nColumna: Direcciones\nColumna: Codigo de la ciudad"+control.get(1));return;}        
+  
+    
+///////////////////////////////////////////////////////////////////////////////////////// 
             Object tablax[][] = new Object [columnas+6][filas-1];
             int colcontx=0,filcontx=0,contTitulosx=0;;
             String encabezadosx[] = new String[columnas+6];
@@ -246,6 +245,7 @@ public   void importExcel() throws IOException {
             }
     
 }
+@SuppressWarnings("UnusedAssignment")
 public  void importCsv() throws IOException {
     BufferedReader br = null;descomponer d; Zonal zn;baseZonas bzn = new baseZonas();
     ArrayList<llaves> l = new ArrayList();
@@ -291,14 +291,12 @@ public  void importCsv() throws IOException {
            }else{
            }
 //////////////////////////ORDENANDO LA LISTA////////////////////////////////////////////////////////////
-        Collections.sort(l, new Comparator<llaves>(){
-              public int compare(llaves o1, llaves o2) {
-                        int resultado = Double.compare( o1.getValorNum(), o2.getValorNum());
-                if ( resultado != 0 ) { return resultado; }
-                
-                  return resultado;
-                    }  
-                }); 
+        Collections.sort(l, (llaves o1, llaves o2) -> {
+            int resultado = Double.compare( o1.getValorNum(), o2.getValorNum());
+            if ( resultado != 0 ) { return resultado; }
+            
+            return resultado;
+          }); 
 /////////////////////RECORREMOS LA LISTA ORDENADA/////////////////////////////////////////////////////////////////
           exportarCsv(encabezados+";Codigo;Cadena;Consecutivo");//escribimos encabezados
         int cont=0;
@@ -331,7 +329,7 @@ private static String[] removeTrailingQuotes(String[] fields) {
       return result;
    }
  @SuppressWarnings("UnusedAssignment")
- public  void exportExcel(Object data[][], Object cabecera[]) throws BiffException {
+public  void exportExcel(Object data[][], Object cabecera[]) throws BiffException {
     int columnas=data.length,matchfil;
     try
     {
@@ -505,7 +503,7 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
         JOptionPane.showMessageDialog(null,"Error al escribir el fichero. Error: "+ex);
     }
 }
- public void exportarCsv(String valor) throws IOException {
+public void exportarCsv(String valor) throws IOException {
 
      try{
          
@@ -517,16 +515,14 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
                 file.createNewFile();
             }
     
-    FileWriter  dos=new FileWriter(f,true);//FileWriter  dos=new FileWriter(f,true);
-    
-    
-    dos.write((valor==null)?"null":valor);
-    dos.write("\n");
-
-    //i=i+1;
-    //}
-    //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
-    dos.close();
+         try (FileWriter dos = new FileWriter(f,true) //FileWriter  dos=new FileWriter(f,true);
+         ) {
+             dos.write((valor==null)?"null":valor);
+             dos.write("\n");
+             //i=i+1;
+             //}
+             //JOptionPane.showMessageDialog(null, "Proceso Finalizado");
+         }
     }
     catch(FileNotFoundException e){
     System.out.println("No se encontro el archivo");
@@ -535,7 +531,7 @@ public  void exportExcelFil(Object data[][], Object cabecera[],String nomArchivo
     JOptionPane.showMessageDialog(null, "error");
     }
  }
-private List ordenar(Object matriz[][]) {
+  private List ordenar(Object matriz[][]) {
     double valor;int consecutivo = 0;ArrayList <llaves> l=new ArrayList();
     String cadena,codigo,zona; 
     int filas=matriz[0].length, columnas= matriz.length, colmatch=columnas-6;
@@ -565,7 +561,7 @@ private List ordenar(Object matriz[][]) {
    // 
     return l;
 }
-
+@SuppressWarnings("UnusedAssignment")
 private Object verificarArchivo(String archivo) throws IOException{
     int filas,columnas,column,fila,filcont=0,contNum=0,contMatch=0,contLtr=0;
     String cabecera[]={"Concecutivo","CodigoCiudad"};String cuerpo[][];
@@ -616,11 +612,11 @@ private Object verificarArchivo(String archivo) throws IOException{
 }
      return informe;
 }
-private static String verificarArchivoXlsx()throws IOException{
-    int filas,columnas,column,fila,filcont=0,contNum=0,contMatch=0,contLtr=0;
-    String match = null,cellValue;
+private static List verificarArchivoXlsx(String archivo)throws IOException{
+    int filas,columnas,column,fila,filcont=0,contNum=0,contMatch=0;
+    String match = null,cellValue; List lista = new ArrayList();
     try{
-      String outputFile = "C:\\Users\\Usuario\\Documents\\base direcciones.xlsx";
+      String outputFile = archivo;//"C:\\Users\\Usuario\\Documents\\base direcciones.xlsx";
       
       XSSFWorkbook workbook;
      // XSSFWorkbook representa un archivo de Excel
@@ -664,9 +660,9 @@ private static String verificarArchivoXlsx()throws IOException{
                        cell.setCellValue(id);
                      XSSFCell cellNew= row.createCell(column+1);  
                        cellNew.setCellValue(cellValue);
-                     if(match!=null){
-                         
-                     }
+                     //if(match!=null){}
+                      contMatch++;   
+                     
                      }//JOptionPane.showMessageDialog(null,cell.toString()+"#"+ match);
                     
                  }//fin if
@@ -674,31 +670,28 @@ private static String verificarArchivoXlsx()throws IOException{
             } //fin while 
             filcont++;
      }// fin while
-        
-        
-        
-        
-        FileOutputStream excelFileOutPutStream = new FileOutputStream(outputFile);
-        workbook.write(excelFileOutPutStream);
-         excelFileOutPutStream.flush();// Realice una operación de vaciado para actualizar la información en el área de caché al archivo
+        try (FileOutputStream excelFileOutPutStream = new FileOutputStream(outputFile)) {
+            workbook.write(excelFileOutPutStream);
+            excelFileOutPutStream.flush(); // Realice una operación de vaciado para actualizar la información en el área de caché al archivo
+            //cerramos
+        }
+     String mensaje="\nLa columna 2 contenia texto, revise nuevamente el archivo\nResultado de validacion:\nLineas modificadas: "+contMatch;   
       
-        excelFileOutPutStream.close();//cerramos 
-        
-       JOptionPane.showMessageDialog(null,"Finalizado"); 
-          
-     return "";    
+     lista.add(filcont- contNum-1);  
+     if(contMatch>0){lista.add(mensaje); }else{lista.add("");} //JOptionPane.showMessageDialog(null,mensaje)  
+     return lista;    
      ///////////////////////////INCIO DE EXCEPCIONES  
     } catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null,e.getMessage());     
      }
-    return null;
+    return lista;
 }
 public static int buscarCiudStream(String cadena, ArrayList<String> l){
     int result = 0;
     
     List<String> ciud =  l.stream()
                .filter(p->p.toLowerCase().contains(cadena.toLowerCase()))
-               //.map(p->{if(p.isEmpty())} ) 
+               //.map(p -> (p.isEmpty() ? "0-0" : p))
                .collect(Collectors.toList());
     if(ciud.isEmpty()){return result;}else{
     String seg[]=ciud.get(0).split("-");

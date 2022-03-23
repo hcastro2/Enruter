@@ -868,20 +868,28 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         
 //<editor-fold defaultstate="collapsed" desc="objetos: jPanel1,btnExcel,btnCsv,listciud btn,lb,txt...">        
     private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
-    // lbProcesando.setVisible(true);
+     final SwingWorker worker = new SwingWorker(){
+ 
+			@Override
+			protected Object doInBackground() throws Exception {
+				//METODO AQUI
         try {
    
           Excel ex = new Excel();
           
         // ajustaricon();//muestra gif de procesando
-         // ex.importExcel();// TODO add your handling code here:
-          ex.importExcel();
+          lbProgreso.setVisible(true);
+          ex.importExcel();lbProgreso.setVisible(false);
           llenarTable(descomponer.DirErrColect);//LLENA LA TABLA CON LAS DIRECCIONES NO LEIDAS
            descomponer.exportar_TextBasura(descomponer.garbagColect);
            
-      } catch (IOException ex1) {
+     } catch (IOException ex1) {
           Logger.getLogger(form_geo.class.getName()).log(Level.SEVERE, null, ex1);
       }
+     	return null;
+			}	
+		};
+		worker.execute();  
     }//GEN-LAST:event_btnExcelActionPerformed
 
     private void lista_ciudadesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_lista_ciudadesItemStateChanged
@@ -1142,7 +1150,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
         }
         JOptionPane.showMessageDialog(null,conta +" Elementos Guardados\nLineas Con inconsistencias "+ contrr+"\n"+acumZonas );
       try {
-          tools.exportarXarchivo(acumZonas,"zonasCreadas");
+          Tools.exportarXarchivo(acumZonas,"zonasCreadas");
       } catch (IOException ex) {
          JOptionPane.showMessageDialog(null,"Error al Exportar");
       }
@@ -1201,7 +1209,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
       if ("null".equals(dato)){
           return "null";
       }else{ 
-        String tipo=  tools.isTipo(dato);
+        String tipo=  Tools.isTipo(dato);
         switch(tipo){
             case "l":
                 result = "N?";//JOptionPane.showMessageDialog(null,"tipo de dato incorrecto: "+ dato);
@@ -1216,7 +1224,7 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
                     if (dato.contains(".")){
                         //aqui casos que se escribe el punto como dato decimal
                        String segmentos[] = dato.split("\\."); 
-                          if((segmentos.length==2)&&("n".equals(tools.isTipo(segmentos[0])))&&("n".equals(tools.isTipo(segmentos[1])))){
+                          if((segmentos.length==2)&&("n".equals(Tools.isTipo(segmentos[0])))&&("n".equals(Tools.isTipo(segmentos[1])))){
                           result=dato;
                           } 
                               else{result="Error";}
@@ -1224,9 +1232,9 @@ public class form_geo extends javax.swing.JFrame implements ActionListener {
                     }else{
                     //aqui casos que se puede escribir la calle o la nomenclatura tradicional
                     String segmento[] = dato.split(" ");
-                         if((segmento.length==2)&&("n".equals(tools.isTipo(segmento[0])))&&("l".equals(tools.isTipo(segmento[1])))){
+                         if((segmento.length==2)&&("n".equals(Tools.isTipo(segmento[0])))&&("l".equals(Tools.isTipo(segmento[1])))){
 
-                             result=segmento[0]+"."+tools.letraToNum(segmento[1]);
+                             result=segmento[0]+"."+Tools.letraToNum(segmento[1]);
                           } 
                               else{result="Error";}
                     }

@@ -7,12 +7,22 @@ package enruter;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 /**
@@ -102,15 +112,9 @@ public class pruebas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Object obj = null;//runing();// TODO add your handling code here:
-        //Supplier obj = () -> jTextField1.getText();
-       obj =  jTextField1.getText();
-      //  obj = "dummy";
-      
-        
-        
-        
-        JOptionPane.showMessageDialog(null,((Object)obj).getClass());
+        int seccionesY = 27;//ABCDEFGHIJKLMNÑOPQRSTUVWXYZ // determinan limites de cada calle
+        int seccionesX = 299;//determina agrupaciones de cada vector x ejemplo 
+        int limiteMaximo=300;
     }//GEN-LAST:event_jButton1ActionPerformed
     private void logmensaje(Object s){
         
